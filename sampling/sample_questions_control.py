@@ -25,8 +25,9 @@ combinations = list(itertools.combinations(question_ids, 2))
 i, j = combinations[0]
 focus_Jij = [i, j]
 other_questions = [x for x in question_ids if x not in focus_Jij]
+five_random = random.sample(combinations, 5) # for now 
 
-for i, j in itertools.combinations(question_ids, 2):
+for i, j in five_random:
     focus_Jij = [i, j]
     other_qusetions = [x for x in question_ids if x not in focus_Jij]
     

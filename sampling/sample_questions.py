@@ -37,5 +37,5 @@ bit_string = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in 
 # save data 
 id = randomword(10) 
 save_dat(bit_string, weight_string, subsample_array, 
-         f'../data/subsample_questions/clean/q_20_nan_5_{n_questions}_{id}.dat')
-subsample_data.to_csv(f'../data/subsample_questions/reference/q_20_nan_5_{n_questions}_{id}.csv', index = False)
+         f'../data/sample_questions/mdl_input/q20_nan5_qsub{n_questions}_id{id}.dat')
+subsample_data.to_csv(f'../data/sample_questions/reference/q20_nan5_qsub{n_questions}_id{id}.csv', index = False)

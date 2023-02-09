@@ -30,7 +30,7 @@ for n_questions in tqdm(range(min_questions, max_questions, increment_questions)
     n_Jij = int(n_questions*(n_questions-1)/2)
     multiplier = 1/(n_Jij/max_Jij)
     num_connections = int(round(multiplier*average_num_connections))
-    for i in range(num_connections):
+    for sample in range(num_connections):
         # subsample questions  
         subsample_questions = random.sample(question_ids, n_questions)
         subsample_questions = sorted(subsample_questions)
@@ -47,5 +47,5 @@ for n_questions in tqdm(range(min_questions, max_questions, increment_questions)
         # save data 
         id = randomword(10) 
         save_dat(bit_string, weight_string, subsample_array, 
-                f'../data/sample_questions/mdl_input/q20_nan5_qsub{n_questions}_n{i}_id{id}.dat')
-        subsample_data.to_csv(f'../data/sample_questions/reference/q20_nan5_qsub{n_questions}_n{i}_id{id}.csv', index = False)
+                f'../data/sample_questions/mdl_input/q20_nan5_qsub{n_questions}_n{sample}_id{id}.dat')
+        subsample_data.to_csv(f'../data/sample_questions/reference/q20_nan5_qsub{n_questions}_n{sample}_id{id}.csv', index = False)

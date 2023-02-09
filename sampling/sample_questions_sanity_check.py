@@ -20,17 +20,20 @@ for file in files:
     questions = [int(x) for x in questions]
     dict_sample_questions[number_questions][number_sample] = questions
 
-# this is probably the smartest now 
+# check Jij and hi
 average_num_connections = 10
 max_questions = 20
 min_questions = 5
 increment_questions = 1
 max_Jij = int(max_questions*(max_questions-1)/2)
 
-dict_number_questions = defaultdict(int)
-dict_super = defaultdict(dict)
+dict_Jij = defaultdict(int)
+dict_hi = defaultdict(int)
+dict_Jij_super = defaultdict(dict)
+dict_hi_super = defaultdict(dict)
 for n_questions in range(5, 20, 1): 
     dict_number_questions = defaultdict(int)
+    dict_number_hi = defaultdict(int)
     n_Jij = int(n_questions*(n_questions-1)/2)
     multiplier = 1/(n_Jij/max_Jij)
     num_connections = int(round(multiplier*average_num_connections))
@@ -38,15 +41,17 @@ for n_questions in range(5, 20, 1):
         questions = dict_sample_questions[n_questions][sample]
         for comb in itertools.combinations(questions, 2):
             dict_number_questions[comb] += 1
-    dict_super[n_questions] = dict_number_questions
-    
-# test a couple of these 
+        for question in questions: 
+            dict_number_hi[question] += 1
+    dict_Jij_super[n_questions] = dict_number_questions
+    dict_hi_super[n_questions] = dict_number_hi
+
+# check Jij
 Jij_count_super = []
 for n_questions in [5, 10, 15, 19]:
-    sub_dict = dict_super[n_questions]
+    sub_dict = dict_Jij_super[n_questions]
     Jij_count_list = []
-    for k, v in sub_dict.items(): 
-        #configuration_x, configuration_y = k
+    for v in sub_dict.values(): 
         Jij_count_list.append((n_questions, v))
     Jij_counts = pd.DataFrame(Jij_count_list, columns = ['n_questions', 'count'])
     Jij_count_super.append(Jij_counts)
@@ -57,7 +62,27 @@ fig, ax = plt.subplots(figsize = (10, 10), dpi = 300)
 sns.kdeplot(data = Jij_counts_df, x = 'count', 
             hue = 'n_questions', fill = True, 
             bw_method = 0.5, ax = ax)
-plt.savefig('../figures/sample_questions_sanity_check.pdf', bbox_inches = 'tight')
+plt.savefig('../figures/sample_questions_Jij_check.pdf', bbox_inches = 'tight')
 
 # average number of connections per Jij
 Jij_counts_df.groupby('n_questions')['count'].mean() 
+
+# check hi
+hi_count_super = []
+for n_questions in [5, 10, 15, 19]:
+    sub_dict = dict_hi_super[n_questions]
+    hi_count_list = []
+    for v in sub_dict.values():
+        hi_count_list.append((n_questions, v))
+    hi_counts = pd.DataFrame(hi_count_list, columns = ['n_questions', 'count'])
+    hi_count_super.append(hi_counts)
+hi_counts_df = pd.concat(hi_count_super)
+
+# plot
+fig, ax = plt.subplots(figsize = (10, 10), dpi = 300)
+sns.kdeplot(data = hi_counts_df, x = 'count',
+            hue = 'n_questions', fill = True,
+            bw_method = 0.5, ax = ax)
+plt.savefig('../figures/sample_questions_hi_check.pdf', bbox_inches = 'tight')
+
+hi_counts_df.head(5)

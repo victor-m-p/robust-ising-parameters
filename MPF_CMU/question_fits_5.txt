@@ -1,0 +1,191 @@
+308 observations can be cross-validated.
+For log-sparsity=-2.000000, Log-l of held-out data is: -2.336933
+Clock time for one iteration: 8.546254000000 seconds.
+308 observations can be cross-validated.
+For log-sparsity=4.000000, Log-l of held-out data is: -3.464564
+Clock time for one iteration: 1.908207000000 seconds.
+308 observations can be cross-validated.
+For log-sparsity=1.000000, Log-l of held-out data is: -2.922761
+Clock time for one iteration: 2.044207000000 seconds.
+using goldensection method
+ iter [    lower,     upper]       min  err(est)
+    0 [-2.0000000, 4.0000000] 1.0000000 6.0000000
+308 observations can be cross-validated.
+For log-sparsity=-0.145898, Log-l of held-out data is: -2.402394
+Clock time for one iteration: 3.766083000000 seconds.
+    1 [-2.0000000, 4.0000000] -0.1458980 6.0000000
+308 observations can be cross-validated.
+For log-sparsity=1.437694, Log-l of held-out data is: -3.170215
+Clock time for one iteration: 1.757943000000 seconds.
+    2 [-2.0000000, 1.4376941] -0.1458980 3.4376941
+308 observations can be cross-validated.
+For log-sparsity=-0.854102, Log-l of held-out data is: -2.336085
+Clock time for one iteration: 5.049429000000 seconds.
+    3 [-2.0000000, 1.4376941] -0.8541019 3.4376941
+308 observations can be cross-validated.
+For log-sparsity=0.021286, Log-l of held-out data is: -2.441320
+Clock time for one iteration: 3.500033000000 seconds.
+    4 [-2.0000000, 0.0212862] -0.8541019 2.0212862
+308 observations can be cross-validated.
+For log-sparsity=-1.291796, Log-l of held-out data is: -2.331645
+Clock time for one iteration: 6.649337000000 seconds.
+    5 [-2.0000000, 0.0212862] -1.2917960 2.0212862
+308 observations can be cross-validated.
+For log-sparsity=-0.790243, Log-l of held-out data is: -2.338001
+Clock time for one iteration: 4.718546000000 seconds.
+    6 [-2.0000000, -0.7902433] -1.2917960 1.2097567
+308 observations can be cross-validated.
+For log-sparsity=-1.562306, Log-l of held-out data is: -2.332821
+Clock time for one iteration: 7.134818000000 seconds.
+    7 [-1.5623059, -0.7902433] -1.2917960 0.7720626
+308 observations can be cross-validated.
+For log-sparsity=-1.100220, Log-l of held-out data is: -2.332187
+Clock time for one iteration: 5.709815000000 seconds.
+    8 [-1.5623059, -1.1002199] -1.2917960 0.4620859
+308 observations can be cross-validated.
+For log-sparsity=-1.395122, Log-l of held-out data is: -2.331895
+Clock time for one iteration: 6.903486000000 seconds.
+    9 [-1.3951216, -1.1002199] -1.2917960 0.2949017
+308 observations can be cross-validated.
+For log-sparsity=-1.218620, Log-l of held-out data is: -2.331672
+Clock time for one iteration: 6.370065000000 seconds.
+   10 [-1.3951216, -1.2186205] -1.2917960 0.1765011
+308 observations can be cross-validated.
+For log-sparsity=-1.331263, Log-l of held-out data is: -2.331705
+Clock time for one iteration: 6.670919000000 seconds.
+   11 [-1.3312629, -1.2186205] -1.2917960 0.1126424
+308 observations can be cross-validated.
+For log-sparsity=-1.263845, Log-l of held-out data is: -2.331633
+Clock time for one iteration: 6.394568000000 seconds.
+   12 [-1.3312629, -1.2186205] -1.2638455 0.1126424
+308 observations can be cross-validated.
+For log-sparsity=-1.289597, Log-l of held-out data is: -2.331643
+Clock time for one iteration: 6.617295000000 seconds.
+   13 [-1.2895966, -1.2186205] -1.2638455 0.0709761
+308 observations can be cross-validated.
+For log-sparsity=-1.246571, Log-l of held-out data is: -2.331639
+Clock time for one iteration: 6.474908000000 seconds.
+   14 [-1.2895966, -1.2465710] -1.2638455 0.0430256
+308 observations can be cross-validated.
+For log-sparsity=-1.273682, Log-l of held-out data is: -2.331634
+Clock time for one iteration: 6.573498000000 seconds.
+   15 [-1.2736815, -1.2465710] -1.2638455 0.0271105
+308 observations can be cross-validated.
+For log-sparsity=-1.257247, Log-l of held-out data is: -2.331634
+Clock time for one iteration: 6.567622000000 seconds.
+   16 [-1.2736815, -1.2572472] -1.2638455 0.0164343
+308 observations can be cross-validated.
+For log-sparsity=-1.267602, Log-l of held-out data is: -2.331633
+Clock time for one iteration: 6.523896000000 seconds.
+   17 [-1.2676025, -1.2572472] -1.2638455 0.0103553
+308 observations can be cross-validated.
+For log-sparsity=-1.261325, Log-l of held-out data is: -2.331633
+Clock time for one iteration: 6.516006000000 seconds.
+   18 [-1.2676025, -1.2613252] -1.2638455 0.0062773
+308 observations can be cross-validated.
+For log-sparsity=-1.265281, Log-l of held-out data is: -2.331633
+Clock time for one iteration: 6.685455000000 seconds.
+   19 [-1.2652805, -1.2613252] -1.2638455 0.0039554
+308 observations can be cross-validated.
+For log-sparsity=-1.262883, Log-l of held-out data is: -2.331633
+Clock time for one iteration: 6.637072000000 seconds.
+   20 [-1.2652805, -1.2628828] -1.2638455 0.0023977
+Found a best sparsity without NaNs (-1.263845)
+Found a best-fit solution without NaNs (308; 1013.117152): 0.018642 -0.178006 -0.455250 0.173026 0.129897 0.219122 0.666553 -0.314807 -0.006733 -0.104813 -0.285042 0.143367 0.402946 -2.467222 0.363141 
+308 observations can be cross-validated.
+For log-sparsity=-2.000000, Log-l of held-out data is: -2.370417
+Clock time for one iteration: 74.409359000000 seconds.
+308 observations can be cross-validated.
+For log-sparsity=4.000000, Log-l of held-out data is: -3.464769
+Clock time for one iteration: 9.320311000000 seconds.
+308 observations can be cross-validated.
+For log-sparsity=1.000000, Log-l of held-out data is: -2.968966
+Clock time for one iteration: 12.856835000000 seconds.
+using goldensection method
+ iter [    lower,     upper]       min  err(est)
+    0 [-2.0000000, 4.0000000] 1.0000000 6.0000000
+308 observations can be cross-validated.
+For log-sparsity=-0.145898, Log-l of held-out data is: -2.437523
+Clock time for one iteration: 30.136413000000 seconds.
+    1 [-2.0000000, 4.0000000] -0.1458980 6.0000000
+308 observations can be cross-validated.
+For log-sparsity=1.437694, Log-l of held-out data is: -3.206251
+Clock time for one iteration: 11.323266000000 seconds.
+    2 [-2.0000000, 1.4376941] -0.1458980 3.4376941
+308 observations can be cross-validated.
+For log-sparsity=-0.854102, Log-l of held-out data is: -2.369585
+Clock time for one iteration: 39.824299000000 seconds.
+    3 [-2.0000000, 1.4376941] -0.8541019 3.4376941
+308 observations can be cross-validated.
+For log-sparsity=0.021286, Log-l of held-out data is: -2.477698
+Clock time for one iteration: 25.239966000000 seconds.
+    4 [-2.0000000, 0.0212862] -0.8541019 2.0212862
+308 observations can be cross-validated.
+For log-sparsity=-1.291796, Log-l of held-out data is: -2.365056
+Clock time for one iteration: 46.348668000000 seconds.
+    5 [-2.0000000, 0.0212862] -1.2917960 2.0212862
+308 observations can be cross-validated.
+For log-sparsity=-0.790243, Log-l of held-out data is: -2.371525
+Clock time for one iteration: 41.491257000000 seconds.
+    6 [-2.0000000, -0.7902433] -1.2917960 1.2097567
+308 observations can be cross-validated.
+For log-sparsity=-1.562306, Log-l of held-out data is: -2.366197
+Clock time for one iteration: 56.908505000000 seconds.
+    7 [-1.5623059, -0.7902433] -1.2917960 0.7720626
+308 observations can be cross-validated.
+For log-sparsity=-1.100220, Log-l of held-out data is: -2.365630
+Clock time for one iteration: 39.459712000000 seconds.
+    8 [-1.5623059, -1.1002199] -1.2917960 0.4620859
+308 observations can be cross-validated.
+For log-sparsity=-1.395122, Log-l of held-out data is: -2.365291
+Clock time for one iteration: 48.213014000000 seconds.
+    9 [-1.3951216, -1.1002199] -1.2917960 0.2949017
+308 observations can be cross-validated.
+For log-sparsity=-1.218620, Log-l of held-out data is: -2.365093
+Clock time for one iteration: 39.680425000000 seconds.
+   10 [-1.3951216, -1.2186205] -1.2917960 0.1765011
+308 observations can be cross-validated.
+For log-sparsity=-1.331263, Log-l of held-out data is: -2.365110
+Clock time for one iteration: 45.322836000000 seconds.
+   11 [-1.3312629, -1.2186205] -1.2917960 0.1126424
+308 observations can be cross-validated.
+For log-sparsity=-1.263845, Log-l of held-out data is: -2.365048
+Clock time for one iteration: 43.946837000000 seconds.
+   12 [-1.3312629, -1.2186205] -1.2638455 0.1126424
+308 observations can be cross-validated.
+For log-sparsity=-1.289597, Log-l of held-out data is: -2.365054
+Clock time for one iteration: 46.638099000000 seconds.
+   13 [-1.2895966, -1.2186205] -1.2638455 0.0709761
+308 observations can be cross-validated.
+For log-sparsity=-1.246571, Log-l of held-out data is: -2.365056
+Clock time for one iteration: 39.742568000000 seconds.
+   14 [-1.2895966, -1.2465710] -1.2638455 0.0430256
+308 observations can be cross-validated.
+For log-sparsity=-1.273682, Log-l of held-out data is: -2.365047
+Clock time for one iteration: 44.435852000000 seconds.
+   15 [-1.2895966, -1.2465710] -1.2736815 0.0430256
+308 observations can be cross-validated.
+For log-sparsity=-1.263326, Log-l of held-out data is: -2.365047
+Clock time for one iteration: 42.931856000000 seconds.
+   16 [-1.2895966, -1.2465710] -1.2633262 0.0430256
+308 observations can be cross-validated.
+For log-sparsity=-1.273361, Log-l of held-out data is: -2.365047
+Clock time for one iteration: 43.881984000000 seconds.
+   17 [-1.2733606, -1.2465710] -1.2633262 0.0267896
+308 observations can be cross-validated.
+For log-sparsity=-1.256926, Log-l of held-out data is: -2.365050
+Clock time for one iteration: 43.299517000000 seconds.
+   18 [-1.2733606, -1.2569263] -1.2633262 0.0164343
+308 observations can be cross-validated.
+For log-sparsity=-1.267159, Log-l of held-out data is: -2.365047
+Clock time for one iteration: 44.382585000000 seconds.
+   19 [-1.2671590, -1.2569263] -1.2633262 0.0102327
+308 observations can be cross-validated.
+For log-sparsity=-1.260882, Log-l of held-out data is: -2.365048
+Clock time for one iteration: 41.977935000000 seconds.
+   20 [-1.2671590, -1.2608817] -1.2633262 0.0062773
+Found a best sparsity with NaNs (-1.263326): Best log_sparsity: -1.263326
+Now doing 424
+1315.645418
+params=[6.6200258996e-03, -2.2236771934e-01, -3.4522743257e-01, 2.3512919629e-01, 1.7255806686e-01, 2.5270513078e-01, 7.0857368076e-01, -3.4179067444e-01, 4.0097835014e-03, -1.0422582308e-01, -1.1947318947e-01, 1.3866522824e-01, 1.0361542759e-01, -2.3882396996e+00, 3.7589029935e-01]
+Clock time: 1042.370579000000 seconds.

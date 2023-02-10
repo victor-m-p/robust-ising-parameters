@@ -13,6 +13,10 @@ conversion_dict = {
     '1': '1'
 }
 
+def remove_zero_rows(df, columns):
+    mask = (df[columns] != 0).any(axis=1)
+    return df[mask]
+ 
 # load data
 full_data = pd.read_csv('../data/reference/direct_reference_questions_20_maxna_5_nrows_455_entries_407.csv')
 question_reference = pd.read_csv('../data/preprocessing/question_reference.csv')
@@ -25,7 +29,7 @@ combinations = list(itertools.combinations(question_ids, 2))
 i, j = combinations[0]
 focus_Jij = [i, j]
 other_questions = [x for x in question_ids if x not in focus_Jij]
-five_random = random.sample(combinations, 5) # for now 
+five_random = random.sample(combinations, 10) # for now 
 
 for i, j in five_random:
     focus_Jij = [i, j]
@@ -40,6 +44,12 @@ for i, j in five_random:
         subsample_columns = ['entry_id'] + subsample_questions + ['weight']
         subsample_data = full_data[subsample_columns]
 
+        # collapse entries that now have the same questions 
+        subsample_data = subsample_data.groupby(['entry_id'] + subsample_questions)['weight'].sum().reset_index(name = 'weight')
+
+        # remove potential nan rows 
+        subsample_data = remove_zero_rows(subsample_data, subsample_questions)
+
         # create corresponding array 
         subsample_array = subsample_data[subsample_questions].to_numpy()
 
@@ -50,5 +60,5 @@ for i, j in five_random:
         # save data 
         id = randomword(10) 
         save_dat(bit_string, weight_string, subsample_array, 
-                f'../data/sample_questions/mdl_input/q20_nan5_n{num_questions}_i{i}_j{j}_sample{sample}_id{id}.dat')
-        subsample_data.to_csv(f'../data/sample_questions/reference/q20_nan5_n{num_questions}_i{i}_j{j}_sample{sample}_id{id}.csv', index = False)
+                f'../data/sample_questions/mdl/q20_nan5_n{num_questions}_i{i}_j{j}_sample{sample}_id{id}.dat')
+        subsample_data.to_csv(f'../data/sample_questions/reference2/q20_nan5_n{num_questions}_i{i}_j{j}_sample{sample}_id{id}.csv', index = False)

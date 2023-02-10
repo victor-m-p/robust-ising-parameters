@@ -154,7 +154,6 @@ def apply_combinations(best_entries, entry_id_column,
         entry_combinations_lst.extend(entry_combinations)
     return entry_combinations_lst
 
-
 def to_dataframe(weighted_combinations):
     """list of tuple to dataframe
 

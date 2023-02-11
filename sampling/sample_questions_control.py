@@ -26,10 +26,16 @@ question_ids = [str(x) for x in question_ids]
 # all two-question combinations
 num_questions = 5
 combinations = list(itertools.combinations(question_ids, 2))
-i, j = combinations[0]
-focus_Jij = [i, j]
-other_questions = [x for x in question_ids if x not in focus_Jij]
 five_random = random.sample(combinations, 10) # for now 
+
+# for now match the other (5 rather than 10) 
+five_random = [
+    ("4676", "5152"),
+    ("4745", "5137"),
+    ("4776", "4808"),
+    ("4776", "4827"),
+    ("4780", "5220")
+]
 
 for i, j in five_random:
     focus_Jij = [i, j]
@@ -60,5 +66,5 @@ for i, j in five_random:
         # save data 
         id = randomword(10) 
         save_dat(bit_string, weight_string, subsample_array, 
-                f'../data/sample_questions/mdl/q20_nan5_n{num_questions}_i{i}_j{j}_sample{sample}_id{id}.dat')
-        subsample_data.to_csv(f'../data/sample_questions/reference2/q20_nan5_n{num_questions}_i{i}_j{j}_sample{sample}_id{id}.csv', index = False)
+                f'../data/sample_questions/mdl_10/q20_nan5_n{num_questions}_i{i}_j{j}_sample{sample}_id{id}.dat')
+        subsample_data.to_csv(f'../data/sample_questions/reference_10/q20_nan5_n{num_questions}_i{i}_j{j}_sample{sample}_id{id}.csv', index = False)

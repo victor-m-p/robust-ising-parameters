@@ -24,7 +24,7 @@ question_ids = question_reference['question_id_drh'].tolist()
 question_ids = [str(x) for x in question_ids]
 
 # all two-question combinations
-num_questions = 5
+num_questions = 10
 combinations = list(itertools.combinations(question_ids, 2))
 five_random = random.sample(combinations, 10) # for now 
 

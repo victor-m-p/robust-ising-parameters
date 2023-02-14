@@ -1,0 +1,78 @@
+239 observations can be cross-validated.
+For log-sparsity=-2.000000, Log-l of held-out data is: -3.834255
+Clock time for one iteration: 332.203761000000 seconds.
+239 observations can be cross-validated.
+For log-sparsity=4.000000, Log-l of held-out data is: -6.916923
+Clock time for one iteration: 21.527185000000 seconds.
+239 observations can be cross-validated.
+For log-sparsity=1.000000, Log-l of held-out data is: -4.312736
+Clock time for one iteration: 33.300108000000 seconds.
+using goldensection method
+ iter [    lower,     upper]       min  err(est)
+    0 [-2.0000000, 4.0000000] 1.0000000 6.0000000
+239 observations can be cross-validated.
+For log-sparsity=-0.145898, Log-l of held-out data is: -3.780626
+Clock time for one iteration: 78.465627000000 seconds.
+    1 [-2.0000000, 4.0000000] -0.1458980 6.0000000
+239 observations can be cross-validated.
+For log-sparsity=1.437694, Log-l of held-out data is: -4.989626
+Clock time for one iteration: 24.935846000000 seconds.
+    2 [-2.0000000, 1.4376941] -0.1458980 3.4376941
+239 observations can be cross-validated.
+For log-sparsity=-0.854102, Log-l of held-out data is: -3.766098
+Clock time for one iteration: 135.883299000000 seconds.
+    3 [-2.0000000, 1.4376941] -0.8541019 3.4376941
+239 observations can be cross-validated.
+For log-sparsity=0.021286, Log-l of held-out data is: -3.799175
+Clock time for one iteration: 67.752178000000 seconds.
+    4 [-2.0000000, 0.0212862] -0.8541019 2.0212862
+239 observations can be cross-validated.
+For log-sparsity=-1.291796, Log-l of held-out data is: -3.783250
+Clock time for one iteration: 193.922261000000 seconds.
+    5 [-1.2917960, 0.0212862] -0.8541019 1.3130823
+239 observations can be cross-validated.
+For log-sparsity=-0.519733, Log-l of held-out data is: -3.763505
+Clock time for one iteration: 104.786717000000 seconds.
+    6 [-1.2917960, 0.0212862] -0.5197334 1.3130823
+239 observations can be cross-validated.
+For log-sparsity=-0.814635, Log-l of held-out data is: -3.765213
+Clock time for one iteration: 131.208091000000 seconds.
+    7 [-0.8146351, 0.0212862] -0.5197334 0.8359213
+239 observations can be cross-validated.
+For log-sparsity=-0.313082, Log-l of held-out data is: -3.769505
+Clock time for one iteration: 87.558346000000 seconds.
+    8 [-0.8146351, -0.3130823] -0.5197334 0.5015528
+239 observations can be cross-validated.
+For log-sparsity=-0.632376, Log-l of held-out data is: -3.762994
+Clock time for one iteration: 115.605288000000 seconds.
+    9 [-0.8146351, -0.3130823] -0.6323758 0.5015528
+239 observations can be cross-validated.
+For log-sparsity=-0.510417, Log-l of held-out data is: -3.763626
+Clock time for one iteration: 103.142310000000 seconds.
+   10 [-0.8146351, -0.5104166] -0.6323758 0.3042185
+239 observations can be cross-validated.
+For log-sparsity=-0.701993, Log-l of held-out data is: -3.763446
+Clock time for one iteration: 121.797349000000 seconds.
+   11 [-0.7019927, -0.5104166] -0.6323758 0.1915761
+239 observations can be cross-validated.
+For log-sparsity=-0.585792, Log-l of held-out data is: -3.763006
+Clock time for one iteration: 110.489208000000 seconds.
+   12 [-0.7019927, -0.5857915] -0.6323758 0.1162011
+239 observations can be cross-validated.
+For log-sparsity=-0.658967, Log-l of held-out data is: -3.763112
+Clock time for one iteration: 118.649068000000 seconds.
+   13 [-0.6589671, -0.5857915] -0.6323758 0.0731756
+239 observations can be cross-validated.
+For log-sparsity=-0.614582, Log-l of held-out data is: -3.762968
+Clock time for one iteration: 114.320856000000 seconds.
+   14 [-0.6589671, -0.5857915] -0.6145822 0.0731756
+239 observations can be cross-validated.
+For log-sparsity=-0.631536, Log-l of held-out data is: -3.762993
+Clock time for one iteration: 115.163217000000 seconds.
+   15 [-0.6315357, -0.5857915] -0.6145822 0.0457442
+239 observations can be cross-validated.
+For log-sparsity=-0.603585, Log-l of held-out data is: -3.762971
+Clock time for one iteration: 114.095856000000 seconds.
+   16 [-0.6315357, -0.6035851] -0.6145822 0.0279506
+239 observations can be cross-validated.
+For log-sparsity=-0.621058, Log-l of

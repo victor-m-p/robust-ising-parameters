@@ -4,10 +4,6 @@ import pandas as pd
 import argparse 
 import pytensor.tensor as at 
 
-#n_samples = 500
-#n_questions = 3
-#true_beta = 0.5 
-
 def string_of_numbers_to_list(number_string): 
     return [int(m) for n in number_string for m in n if m in '0123456789']
 
@@ -56,12 +52,17 @@ def main(n_questions, n_samples, true_beta):
     for predictor_idx, outcome_idx in zip(predictor_idx_list, outcome_idx_list):
         model = pm.Model()
         with model: 
-            alpha = pm.Normal("alpha", mu=0, sigma=5)
-            beta = pm.Normal("beta", mu=0, sigma=5, shape=2)
+            alpha = pm.Normal("alpha", mu=0, sigma=1.5) # should mu=0 be baseline expectation?
+            beta = pm.Normal("beta", mu=0, sigma=1.5, shape=len(predictor_idx))
             p = pm.Deterministic("p", pm.math.invlogit(alpha + at.dot(X[:, predictor_idx], beta)))
             outcome = pm.Bernoulli("outcome", p, observed=X[:, outcome_idx])
         with model: 
-            idata = pm.sample()
+            idata = pm.sample(            
+                              draws = 1000, # default
+                              tune = 1000, # default
+                              target_accept = .99,
+                              max_treedepth = 20,
+                              random_seed = 412)
         idata_list.append(idata)
         combination_list.append([(predictor_idx), (outcome_idx)])
 
@@ -110,9 +111,8 @@ def main(n_questions, n_samples, true_beta):
     full_summary['Actual'] = np.concatenate([htrue, Jtrue])
 
     # save this information 
-    full_summary.to_csv(f'../data/logistic/summary_{n_questions}_{n_samples}_{true_beta}.csv', index=False)
+    full_summary.to_csv(f'../data/logistic/summary_{n_questions}_{n_samples}_{true_beta}_restrict.csv', index=False)
     
-
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('-q', '--number_questions', required = True, type = int, help = 'number questions')

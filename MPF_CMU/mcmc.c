@@ -201,7 +201,7 @@ double log_l(all *data, unsigned long int config, double *inferred, int n_blanks
 		for(blank_config=0;blank_config<(1 << n_blanks);blank_config++) { // cycle through all choices for the blanks
 			for(i=0;i<n_blanks;i++) {
 				ipos=loc_blanks[i];
-				if (VALZ(ipos, blank_config) == 1) { // if we want to set the bit to 1...
+				if (VALZ(i, blank_config) == 1) { // if we want to set the bit to 1...
 					config=(config | (1 << ipos)); // do an OR
 				} else {
 					if (VALZ(ipos, config) == 1) { // if we want to set the bit to zero, and the current value is not yet zero...
@@ -218,11 +218,12 @@ double log_l(all *data, unsigned long int config, double *inferred, int n_blanks
 						count++;
 					}
 				}
-				e_loc_running += e_loc;
+				e_loc_running += exp(e_loc);
 
 			}
 		}
-		return e_loc_running/((double)(1 << n_blanks))-log(z_inferred);			
+		return log(e_loc_running)-log(z_inferred);			
+		//		return e_loc_running/((double)(1 << n_blanks))-log(z_inferred);			
 	}
 }
 

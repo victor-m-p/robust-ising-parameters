@@ -3,14 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 from matplotlib.lines import Line2D
 
-
-
 # load hidden nodes data 
 groundtruth = np.loadtxt('../data/hidden_nodes_10/Jh_questions_10_samples_500_scale_0.5.dat')
 hidden0 = np.loadtxt('../data/hidden_nodes_10/questions_10_samples_500_scale_0.5_hidden_0.dat_params.dat')
 hidden1 = np.loadtxt('../data/hidden_nodes_10/questions_10_samples_500_scale_0.5_hidden_1.dat_params.dat')
 hiddenNone = np.loadtxt('../data/hidden_nodes_10/questions_10_samples_500_scale_0.5_hidden_NONE.dat_params.dat')
-
 # look at h params 
 n_nodes = 10
 n_J = int(n_nodes*(n_nodes-1)/2)

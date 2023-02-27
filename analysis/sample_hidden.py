@@ -15,7 +15,7 @@ conversion_dict = {
 # N = 10 system
 n = 10
 C = 500
-scale = 0.25
+scale = 1
 np.random.seed(1)
 invlogit = lambda x: 1 / (1 + np.exp(-x))
 

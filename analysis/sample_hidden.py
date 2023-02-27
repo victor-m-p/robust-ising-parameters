@@ -64,7 +64,7 @@ for i in range(columns-1):
     sample_i[:, i+1] = 0
     bit_string = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in sample_i]
     save_dat(bit_string, weight_string, sample_i,
-             f'../data/hidden_nodes/questions_{n}_samples_{C}_scale_{scale}_hidden_{i}_{i+1}.dat')
+             f'../data/hidden_nodes/questions_{n}_samples_{C}_scale_{scale}_twohidden_{i}.dat')
 
 # save all n-1 (remove node)
 for i in range(columns): 
@@ -72,3 +72,10 @@ for i in range(columns):
     bit_string = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in sample_i]
     save_dat(bit_string, weight_string, sample_i,
              f"../data/hidden_nodes/questions_{n}_samples_{C}_scale_{scale}_removed_{i}.dat")
+
+# delete two nodes  
+for i in range(columns-1): 
+    sample_i = np.delete(sample, np.s_[i:i+2], axis = 1)
+    bit_string = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in sample_i]
+    save_dat(bit_string, weight_string, sample_i,
+            f"../data/hidden_nodes/questions_{n}_samples_{C}_scale_{scale}_tworemoved_{i}.dat")

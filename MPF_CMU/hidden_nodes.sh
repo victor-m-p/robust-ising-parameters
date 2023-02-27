@@ -1,7 +1,6 @@
 #!/bin/bash
-FILES="../data/hidden_nodes_0.25/questions*"
-
+FILES="../data/hidden_nodes/questions*"
 for f in $FILES
 do
-    nohup ./mpf -c "$f" 
+    nohup ./mpf -l "$f" 0
 done 

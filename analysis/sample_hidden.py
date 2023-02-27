@@ -27,7 +27,7 @@ probabilities = p_dist(h, J) # potential culprit
 
 # save probabilities 
 Jh = np.concatenate((J, h))
-np.savetxt(f"../data/hidden_nodes/Jh_questions_{n}_samples_{C}_scale_{scale}.dat", Jh)
+np.savetxt(f"../data/hidden_nodes_0.25/Jh_questions_{n}_samples_{C}_scale_{scale}.dat", Jh)
 
 # get a sample 
 allstates = bin_states(n, True)  # all 2^n possible binary states in {-1,1} basis

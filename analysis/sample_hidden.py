@@ -43,7 +43,7 @@ save_dat(bit_string, weight_string, sample,
          f'../data/hidden_nodes/questions_{n}_samples_{C}_scale_{scale}_complete_0.dat')
 
 # save data with one additional node 
-sample_extra = np.insert(sample, 0, 0, axis=1)
+sample_extra = np.insert(sample, n, 0, axis=1)
 bit_string = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in sample_extra]
 save_dat(bit_string, weight_string, sample_extra,
          f'../data/hidden_nodes/questions_{n}_samples_{C}_scale_{scale}_extra_0.dat')

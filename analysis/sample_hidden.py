@@ -2,8 +2,6 @@ import numpy as np
 from fun import p_dist, bin_states, fast_logsumexp
 from sample_fun import save_dat, randomword
 import pandas as pd 
-A = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-B = np.insert(A, 0, 0, axis=1)
 
 # convert to bit string
 conversion_dict = {
@@ -27,7 +25,7 @@ probabilities = p_dist(h, J) # potential culprit
 
 # save probabilities 
 Jh = np.concatenate((J, h))
-np.savetxt(f"../data/hidden_nodes/Jh_questions_{n}_samples_{C}_scale_{scale}.dat", Jh)
+np.savetxt(f"../data/hidden_nodes/questions_{n}_samples_{C}_scale_{scale}_true_100.dat", Jh)
 
 # get a sample 
 allstates = bin_states(n, True)  # all 2^n possible binary states in {-1,1} basis
@@ -40,13 +38,13 @@ sample = allstates[np.random.choice(range(2**n), # doesn't have to be a range
 bit_string = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in sample]
 weight_string = [str(1.0) for _ in range(C)]
 save_dat(bit_string, weight_string, sample,
-         f'../data/hidden_nodes/questions_{n}_samples_{C}_scale_{scale}_complete_0.dat')
+         f'../data/hidden_nodes/questions_{n}_samples_{C}_scale_{scale}_complete_100.dat')
 
 # save data with one additional node 
 sample_extra = np.insert(sample, n, 0, axis=1)
 bit_string = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in sample_extra]
 save_dat(bit_string, weight_string, sample_extra,
-         f'../data/hidden_nodes/questions_{n}_samples_{C}_scale_{scale}_extra_0.dat')
+         f'../data/hidden_nodes/questions_{n}_samples_{C}_scale_{scale}_extra_100.dat')
 
 # save all n-1 (add hidden node)
 _, columns = sample.shape

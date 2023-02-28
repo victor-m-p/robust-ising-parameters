@@ -207,3 +207,5 @@ sns.scatterplot(data = d_Jij_obs_beta_med_sub2, x = 'groundtruth',
                 y = 'coupling', s = 30, color = 'red')
 plt.plot([-1.2, 1.2], [-1.2, 1.2], c = 'black')
 
+# NB: remember to compare implied 
+# probability of states 

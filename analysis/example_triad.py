@@ -137,5 +137,3 @@ nx.draw_networkx_labels(G, pos, font_size = 8, labels = labeldict)
 plt.show();
 plt.savefig('../figures/reference_params.pdf', bbox_inches = 'tight')
 #plt.savefig('../figures/svg/parameters.svg', bbox_inches = 'tight')
-
-

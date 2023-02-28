@@ -1,3 +1,10 @@
+'''
+going "down" in resolution...
+actually, there is an interesting question here: 
+what is the difference between inferring based on n=4 and then going down to n=3
+instead of directly inferring n=3. Is the landscape more/less spiky for n=4->n=3?
+'''
+
 import pandas as pd 
 import numpy as np 
 import os 

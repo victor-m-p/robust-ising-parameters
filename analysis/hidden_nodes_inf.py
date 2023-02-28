@@ -96,7 +96,7 @@ def sns_scatter_axis(data, param, lims, s, axis):
     axis.plot(lims, lims, 'k-')
 
 # setup
-base_path = '../data/hidden_nodes/'
+base_path = '../data/hidden_dynamical/'
 regex = r'questions_10_samples_500_scale_(\w+.\w+)_(\w+)_(\w+)'
 
 # list files 
@@ -129,6 +129,10 @@ d_hi_true = d_hi_true[['beta', 'hi', 'field']].rename(columns = {'field': 'groun
 d_Jij_comb = pd.merge(d_Jij, d_Jij_true, on=['Jij', 'beta'])
 d_hi_comb = pd.merge(d_hi, d_hi_true, on=['hi', 'beta'])
 
+#### for now only beta = 0.2 ####
+d_Jij_comb = d_Jij_comb[d_Jij_comb['beta'] == '0.2']
+d_hi_comb = d_hi_comb[d_hi_comb['beta'] == '0.2']
+
 # assign whether observed or not 
 d_Jij_comb['unobserved_lvl1'] = d_Jij_comb.apply(lambda row: str(row['id']) in str(row['Jij']) if row['type'] == 'hidden' else False, axis=1)
 d_Jij_comb['unobserved_lvl2'] = d_Jij_comb.apply(lambda row: str(row['id']) in str(row['Jij']) or str(row['id']+1) in str(row['Jij']) if row['type'] == 'twohidden' else False, axis=1)
@@ -138,78 +142,15 @@ d_Jij_obs = d_Jij_comb[d_Jij_comb['observed'] == True]
 # some weird stuff here, need to check up on this 
 d_Jij_comb_beta_low = d_Jij_comb[d_Jij_comb['beta'] == "0.2"] # 1557
 d_Jij_obs_beta_low = d_Jij_obs[d_Jij_obs['beta'] == "0.2"] # 1314
-sns_scatter(d_Jij_comb_beta_low, 'coupling', [-2, 2])
-sns_scatter(d_Jij_obs_beta_low, 'coupling', [-0.7, 0.7])
-
-# medium 
-d_Jij_comb_beta_med = d_Jij_comb[d_Jij_comb['beta'] == "0.5"] # 1557
-d_Jij_obs_beta_med = d_Jij_obs[d_Jij_obs['beta'] == "0.5"] # 1314
-sns_scatter(d_Jij_comb_beta_med, 'coupling', [-2, 2])
-sns_scatter(d_Jij_obs_beta_med, 'coupling', [-1, 1])
-
-# just all regularizes way too much 
-d_Jij_comb_beta_high = d_Jij_comb[d_Jij_comb['beta'] == "1.0"] # 1557
-d_Jij_obs_beta_high = d_Jij_obs[d_Jij_obs['beta'] == "1.0"] # 1314
-sns_scatter(d_Jij_comb_beta_high, 'coupling', [-2, 2])
-sns_scatter(d_Jij_obs_beta_high, 'coupling', [-2, 2])
+sns_scatter(d_Jij_comb_beta_low, 'coupling', [-0.5, 0.5])
+sns_scatter(d_Jij_obs_beta_low, 'coupling', [-0.5, 0.5])
 
 # finer check on beta = 0.2 
 # very close to the same but removed better 
 d_Jij_obs_beta_low_one = d_Jij_obs_beta_low[d_Jij_obs_beta_low['type'].isin(['hidden', 'removed', 'complete'])]
-d_Jij_obs_beta_low_two = d_Jij_obs_beta_med[d_Jij_obs_beta_med['type'].isin(['twohidden', 'tworemoved', 'complete'])]
-fig, (ax1, ax2) = plt.subplots(nrows = 1, ncols = 2, figsize = (12, 5))
-sns_scatter_axis(d_Jij_obs_beta_low_one, 
-                 'coupling', [-0.5, 0.5], 
-                 15, ax1)
-sns_scatter_axis(d_Jij_obs_beta_low_two, 
-                 'coupling', [-1, 1], 15, ax2)
-plt.suptitle('beta = 0.2 (logs = 0)')
-plt.tight_layout()
-plt.show();
+sns_scatter(d_Jij_obs_beta_low_one, 'coupling', [-0.5, 0.5])
 
-# beta = 0.5
-d_Jij_obs_beta_med_one = d_Jij_obs_beta_med[d_Jij_obs_beta_med['type'].isin(['hidden', 'removed', 'complete'])]
-d_Jij_obs_beta_med_two = d_Jij_obs_beta_med[d_Jij_obs_beta_med['type'].isin(['twohidden', 'tworemoved', 'complete'])]
-fig, (ax1, ax2) = plt.subplots(nrows = 1, ncols = 2, figsize = (12, 5))
-sns_scatter_axis(d_Jij_obs_beta_med_one, 
-                 'coupling', [-1, 1], 
-                 15, ax1)
-sns_scatter_axis(d_Jij_obs_beta_med_two, 
-                 'coupling', [-1, 1], 15, ax2)
-plt.suptitle('beta = 0.5 (logs = 0)')
-plt.tight_layout()
-plt.show();
-
-# beta = 1
-d_Jij_obs_beta_high_one = d_Jij_obs_beta_high[d_Jij_obs_beta_high['type'].isin(['hidden', 'removed', 'complete'])]
-d_Jij_obs_beta_high_two = d_Jij_obs_beta_high[d_Jij_obs_beta_high['type'].isin(['twohidden', 'tworemoved', 'complete'])]
-fig, (ax1, ax2) = plt.subplots(nrows = 1, ncols = 2, figsize = (12, 5))
-sns_scatter_axis(d_Jij_obs_beta_high_one, 
-                 'coupling', [-2, 2], 
-                 15, ax1)
-sns_scatter_axis(d_Jij_obs_beta_high_two, 
-                 'coupling', [-2, 2], 15, ax2)
-plt.suptitle('beta = 1.0 (logs = 0)')
-plt.tight_layout()
-plt.show();
-
-# how good is extra nodes?
-d_Jij_obs_beta_low_sub1 = d_Jij_obs_beta_low[d_Jij_obs_beta_low['type'].isin(['hidden', 'removed'])]
-d_Jij_obs_beta_low_sub2 = d_Jij_obs_beta_low[d_Jij_obs_beta_low['type'] == 'extra']
-sns.scatterplot(data = d_Jij_obs_beta_low_sub1, x = 'groundtruth', 
-                y = 'coupling', s = 15, hue = 'type')
-sns.scatterplot(data = d_Jij_obs_beta_low_sub2, x = 'groundtruth',
-                y = 'coupling', s = 30, color = 'red')
-plt.plot([-0.5, 0.5], [-0.5, 0.5], c = 'black')
-
-
-d_Jij_obs_beta_med_sub1 = d_Jij_obs_beta_med[d_Jij_obs_beta_med['type'].isin(['hidden', 'removed'])]
-d_Jij_obs_beta_med_sub2 = d_Jij_obs_beta_med[d_Jij_obs_beta_med['type'] == 'extra']
-sns.scatterplot(data = d_Jij_obs_beta_med_sub1, x = 'groundtruth', 
-                y = 'coupling', s = 15, hue = 'type')
-sns.scatterplot(data = d_Jij_obs_beta_med_sub2, x = 'groundtruth',
-                y = 'coupling', s = 30, color = 'red')
-plt.plot([-1.2, 1.2], [-1.2, 1.2], c = 'black')
-
-# NB: remember to compare implied 
-# probability of states 
+# check what the Jij values are for the hidden params 
+# looks like they now regularize towards 0 ...
+d_Jij_inf = d_Jij_comb[d_Jij_comb['observed'] == False]
+sns_scatter(d_Jij_inf, 'coupling', [-0.5, 0.5])

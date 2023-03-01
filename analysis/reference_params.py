@@ -134,6 +134,5 @@ nx.draw_networkx_labels(G, pos, font_size = 8, labels = labeldict)
 #plt.colorbar(sm_node, cax = ax_node, orientation='horizontal')
 #ax.text(0.24, -0.03, r'Pairwise couplings (J$_{ij}$)', size=20, transform=ax.transAxes)
 #ax.text(0.3, -0.25, r'Local fields (h$_i$)', size = 20, transform = ax.transAxes)
-plt.show();
 plt.savefig('../figures/reference_params.pdf', bbox_inches = 'tight')
 #plt.savefig('../figures/svg/parameters.svg', bbox_inches = 'tight')

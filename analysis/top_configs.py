@@ -30,13 +30,14 @@ entry_maxlikelihood = entry_maxlikelihood[entry_maxlikelihood['config_id'].isin(
 entry_maxlikelihood = entry_maxlikelihood.sort_values('config_prob', ascending = False)
 
 # plot 
-fig, ax = plt.subplots(1, 1, figsize = (4, 7))
+fig, ax = plt.subplots(1, 1, figsize = (4, 7), dpi = 300)
 sns.heatmap(top_configurations.T, linewidth=5, cbar = False) # white = Y, black = N
 plt.yticks(ticks = [x+0.5 for x in range(20)], 
            labels = question_labels, rotation = 0)
-plt.xticks(ticks = [x+0.5 for x in range(5)],
-           labels = ['Cistercians', 'Ancient Egypt', 'Jesuits', "Jehovah's Witnesses", 'Islam Aceh'],
-           rotation = 45)
+#plt.xticks(ticks = [x+0.5 for x in range(5)],
+#           labels = ['Cistercians', 'Ancient Egypt', 'Jesuits', "Jehovah's Witnesses", 'Islam Aceh'],
+#           rotation = 45)
+plt.savefig('../figures/top_configs.svg', bbox_inches = 'tight')
 
 # draw circle 
 import matplotlib.patches as patches

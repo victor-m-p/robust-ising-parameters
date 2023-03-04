@@ -59,4 +59,6 @@ plt.plot([i/(n_states-1) for i in range(n_states)],
 plt.ylim(-15, 7)
 plt.xlabel('rank/(total-1)')
 plt.ylabel('log p*(total)')
+plt.title('Probability of configurations')
 plt.savefig('../figures/rank_vs_normp.pdf', bbox_inches = 'tight')
+plt.savefig('../figures/rank_vs_normp.svg', bbox_inches = 'tight')

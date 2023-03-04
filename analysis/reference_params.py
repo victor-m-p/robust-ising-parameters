@@ -46,7 +46,6 @@ def create_graph(d_edgelst, dct_nodes):
 
 # question labels 
 question_reference = pd.read_csv('../data/preprocessing/question_reference.csv')
-question_labels = question_reference['question'].tolist()
 
 # PLOT PARAMETERS 
 n_nodes, n_nan, n_rows, n_entries = 20, 5, 455, 407
@@ -66,6 +65,11 @@ G, labeldict = create_graph(d_edgelist_sub, dct_nodes)
 
 # different labels now 
 question_labels = question_reference.set_index('question_id')['question'].to_dict()
+question_labels[6] = 'Reincarnation\ninthis world'
+question_labels[18] = 'Small-scale\nrituals'
+question_labels[3] = 'Monumental architecture'
+question_labels[19] = 'Large-scale rituals'
+
 labeldict = {}
 for i in G.nodes(): 
     labeldict[i] = question_labels.get(i)
@@ -85,6 +89,8 @@ x, y = pos[11]
 pos[11] = (x+20, y+25)
 x, y = pos[1]
 pos[1] = (x+15, y-5)
+#x, y = pos[11]
+#pos[10] = (x, y-10)
 
 # plot 
 fig, ax = plt.subplots(figsize = (6, 6), facecolor = 'w', dpi = 500)
@@ -120,19 +126,22 @@ nx.draw_networkx_edges(
     edge_color = weight_lst, 
     alpha = 0.7, 
     edge_cmap = cmap, edge_vmin = vmin_e, edge_vmax = vmax_e)
+
 nx.draw_networkx_labels(G, pos, font_size = 8, labels = labeldict)
+
 # add to axis
 #sm_edge = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin = vmin_e, vmax=vmax_e))
 #sm_edge._A = []
 #sm_node = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin = vmin_n, vmax=vmax_n))
 #sm_node._A = []
 #axis = plt.gca()
-#plt.subplots_adjust(bottom=0.1, right=1, left=0, top=1)
+#plt.subplots_adjust(bottom=0, right=0.9, left=0.1, top=1)
 #ax_edge = plt.axes([0.05, 0, 0.90, 0.05])
 #ax_node = plt.axes([0.05, -0.2, 0.9, 0.05])
 #plt.colorbar(sm_edge, cax = ax_edge, orientation='horizontal')
 #plt.colorbar(sm_node, cax = ax_node, orientation='horizontal')
 #ax.text(0.24, -0.03, r'Pairwise couplings (J$_{ij}$)', size=20, transform=ax.transAxes)
 #ax.text(0.3, -0.25, r'Local fields (h$_i$)', size = 20, transform = ax.transAxes)
-plt.savefig('../figures/reference_params.pdf', bbox_inches = 'tight')
-#plt.savefig('../figures/svg/parameters.svg', bbox_inches = 'tight')
+plt.savefig('../figures/reference_params.pdf')
+plt.savefig('../figures/reference_params.svg')
+plt.savefig('../figures/reference_params.png', bbox_inches = 'tight')

@@ -16,7 +16,6 @@ intervention_off_idx = np.where(configurations[:, intervention_var] == -1)[0]
 
 # just start looking at the intervention off 
 intervention_off_idx_sample = np.random.choice(intervention_off_idx, 1000, replace=False) # replace, probability?
-# np.random.shuffle(A) # they are already random 
 
 # Split A into two equal-sized arrays B and C
 control_group_idx = intervention_off_idx_sample[:500]
@@ -78,7 +77,6 @@ intervention = np.concatenate((np.zeros(500), np.ones(500))) # or this -1/1
 
 np.mean(control_outcome)
 np.mean(experiment_outcome)
-
 
 # now we are ready to model this 
 import pymc as pm 

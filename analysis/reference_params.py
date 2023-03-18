@@ -88,9 +88,19 @@ pos[12] = (x-10, y-5)
 x, y = pos[11]
 pos[11] = (x+20, y+25)
 x, y = pos[1]
-pos[1] = (x+15, y-5)
-#x, y = pos[11]
-#pos[10] = (x, y-10)
+pos[1] = (x+15, y-5) # political support 
+x, y = pos[2] # scriptures
+pos[2] = (x, y-10)
+x, y = pos[18] # small-scale
+pos[18] = (x, y+5)
+x, y = pos[9] # grave goods
+pos[9] = (x, y+15)
+x, y = pos[14] # castration
+pos[14] = (x-5, y-5)
+x, y = pos[7] # special corpse
+pos[7] = (x, y-5)
+x, y = pos[12] # monitoring
+pos[12] = (x, y+5)
 
 # plot 
 fig, ax = plt.subplots(figsize = (6, 6), facecolor = 'w', dpi = 500)

@@ -2,7 +2,7 @@ import numpy as np
 from fun import p_dist, bin_states, fast_logsumexp
 
 # setup
-n = 3
+n = 20
 C = 100
 np.random.seed(0)
 

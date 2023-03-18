@@ -11,6 +11,9 @@ import pandas as pd
 import numpy as np 
 import os 
 
+d = pd.read_csv('../data/reference/NSDUH_2008_2019_NAN5.csv')
+d
+
 # columns that we care about 
 ## select only the columns we care about 
 columns_2016_2019 = [
@@ -198,3 +201,24 @@ with open('../data/clean/NSDUH_2008_2019_NAN5.txt', 'w') as f:
     f.write(f'{rows}\n{cols}\n')
     for bit, weight in zip(bit_string, w): 
         f.write(f'{bit} {weight}\n')
+        
+# remove the two crazy columns 
+data_subset = data_subset.drop(columns = ['SUICPLAN', 'SUICTRY'])
+zero_counts = (data_subset == 0).sum(axis=1)
+d_LEQ5.to_csv('../data/reference/NSDUH_2008_2019_NAN5_SUIC.csv', index=False)
+
+# put it in the MPF format and save 
+A_LEQ5 = d_LEQ5.to_numpy()
+conversion_dict = {
+    '-1': '0',
+    '0': 'X',
+    '1': '1'
+}
+bit_string = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in A_LEQ5]
+w = np.ones(len(A_LEQ5))
+rows, cols = A_LEQ5.shape
+with open('../data/clean/NSDUH_2008_2019_NAN5_SUIC.txt', 'w') as f: 
+    f.write(f'{rows}\n{cols}\n')
+    for bit, weight in zip(bit_string, w): 
+        f.write(f'{bit} {weight}\n')
+ 

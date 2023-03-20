@@ -11,9 +11,6 @@ import pandas as pd
 import numpy as np 
 import os 
 
-d = pd.read_csv('../data/reference/NSDUH_2008_2019_NAN5.csv')
-d
-
 # columns that we care about 
 ## select only the columns we care about 
 columns_2016_2019 = [
@@ -73,14 +70,18 @@ data_2015 = []
 for f in subfiles:
     print(f)
     d = pd.read_csv(dir_path + f, sep = "\t") 
-    if int(re.match('NSDUH_(\d{4})', f).group(1)) <= 2014:
+    year = int(re.match('NSDUH_(\d{4})', f).group(1))
+    if year <= 2014:
         d = d[columns_2008_2014]
+        d['year'] = year
         data_2008_2014.append(d) 
-    elif int(re.match('NSDUH_(\d{4})', f).group(1)) == 2015:
+    elif year == 2015:
         d = d[columns_2015]
+        d['year'] = year
         data_2015.append(d)
     else: 
         d = d[columns_2016_2019]
+        d['year'] = year
         data_2016_2019.append(d) 
 
 # create the dataframes 
@@ -169,6 +170,7 @@ data_all_years['SPDYR'] = data_all_years['SPDYR'].replace(recode_distress).astyp
 ### IRMARIT/IRMARITSTAT: 1 = Married, ..., 4 = Never
 ### CATAGE: 3 = 26-34, ...
 ### NEWRACE2: 1 = White (non-hispanic), ...
+data_all_years.to_csv('../data/reference/NSDUH_pre_demographics.csv', index=False)
 len(data_all_years) # 674.521
 data_subset = data_all_years[data_all_years['IRSEX'] == 1]
 len(data_subset) # 322.636
@@ -177,34 +179,18 @@ len(data_subset) # 39.472
 data_subset = data_subset[data_subset['NEWRACE2'] == 1]
 len(data_subset) # 23.516
 
-# now get rid of demographics
-data_subset = data_subset.drop(columns = ['IRSEX', 'CATAGE', 'NEWRACE2', 'IRMARIT'])
+# now get rid of demographics & filedate
+data_subset = data_subset.drop(columns = ['IRSEX', 'CATAGE', 
+                                          'NEWRACE2', 'IRMARIT', 
+                                          'SUICPLAN', 'SUICTRY',
+                                          'year'])
 
-# only the ones that have less than 5 nan 
+# remove the two crazy columns 
 zero_counts = (data_subset == 0).sum(axis=1)
 d_LEQ5 = data_subset[zero_counts <= 5]
 
-# save to reference 
-d_LEQ5.to_csv('../data/reference/NSDUH_2008_2019_NAN5.csv', index=False)
-
-# put it in the MPF format and save 
-A_LEQ5 = d_LEQ5.to_numpy()
-conversion_dict = {
-    '-1': '0',
-    '0': 'X',
-    '1': '1'
-}
-bit_string = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in A_LEQ5]
-w = np.ones(len(A_LEQ5))
-rows, cols = A_LEQ5.shape
-with open('../data/clean/NSDUH_2008_2019_NAN5.txt', 'w') as f: 
-    f.write(f'{rows}\n{cols}\n')
-    for bit, weight in zip(bit_string, w): 
-        f.write(f'{bit} {weight}\n')
-        
-# remove the two crazy columns 
-data_subset = data_subset.drop(columns = ['SUICPLAN', 'SUICTRY'])
-zero_counts = (data_subset == 0).sum(axis=1)
+# randomly scramble rows
+d_LEQ5 = d_LEQ5.sample(frac=1).reset_index(drop=True)
 d_LEQ5.to_csv('../data/reference/NSDUH_2008_2019_NAN5_SUIC.csv', index=False)
 
 # put it in the MPF format and save 
@@ -214,6 +200,7 @@ conversion_dict = {
     '0': 'X',
     '1': '1'
 }
+
 bit_string = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in A_LEQ5]
 w = np.ones(len(A_LEQ5))
 rows, cols = A_LEQ5.shape
@@ -221,4 +208,3 @@ with open('../data/clean/NSDUH_2008_2019_NAN5_SUIC.txt', 'w') as f:
     f.write(f'{rows}\n{cols}\n')
     for bit, weight in zip(bit_string, w): 
         f.write(f'{bit} {weight}\n')
- 

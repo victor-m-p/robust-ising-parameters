@@ -1,0 +1,18 @@
+question,question_NSDUH,question_id
+hidden1,hidden1,1
+Cigarette,CIGREC,2
+Alcohol,ALCREC,3
+Marijuana,MJREC,4
+Cocaine,COCREC,5
+Heroin,HERREC,6
+LSD,LSDREC,7
+PCP,PCPREC,8
+Ecstasy,ECSTMOREC,9
+Inhalants,INHALREC,10
+Pain relievers,PNRNMREC,11
+Tranquilizers,TRQNMREC,12
+Stimulants,STMNMREC,13
+Sedatives,SEDNMREC,14
+Suicide thoughts,SUICTHNK,15
+Major depression,AMDEYR,16
+Psychological distress,SPDYR,17

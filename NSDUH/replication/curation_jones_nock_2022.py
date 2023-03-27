@@ -128,15 +128,50 @@ recode_risky = {
     }
 d['RSKYFQTES'] = d['RSKYFQTES'].replace(recode_risky)
 
+# binarize demographics 
+## likert columns split as evenly as possible 
+def split_likert_column(d, column): 
+    d_binary = d.groupby(column).size().reset_index(name='count')
+    d_binary = d_binary.sort_values(by = column)
+    d_binary['cumsum'] = d_binary['count'].cumsum()
+    # Calculate the total sum
+    total_sum = d_binary['count'].sum()
+    # Find the split point that minimizes the difference between the sums of the two groups
+    split_point = (d_binary['cumsum'] - total_sum / 2).abs().idxmin()
+    d_binary[f'{column}_binary'] = d_binary.index.to_series().apply(lambda x: -1 if x <= split_point else 1)
+    d_binary = d_binary[[column, f'{column}_binary']]
+    d_binary = d.merge(d_binary, on = column, how = 'inner')
+    return d_binary
+
+d = split_likert_column(d, 'IREDUHIGHST2') 
+d = split_likert_column(d, 'CATAG6')
+d = split_likert_column(d, 'INCOME')
+
+## check splits 
+### education: splits between high-school and some college
+d.groupby(['IREDUHIGHST2', 'IREDUHIGHST2_binary']).size().reset_index(name='count')
+### age: splits [18:34] vs [35+] 
+d.groupby(['CATAG6', 'CATAG6_binary']).size().reset_index(name='count')
+### income: splits [<49.999] vs [>=50.000]
+d.groupby(['INCOME', 'INCOME_binary']).size().reset_index(name='count')
+
+## non-likert columns split manually 
+### gender already done 
+d['IRSEX_binary'] = d['IRSEX'].apply(lambda x: -1 if x == 1 else 1)
+### race (white vs. non-white) with white as reference
+d['NEWRACE2_binary'] = d['NEWRACE2'].apply(lambda x: -1 if x == 1 else 1)
+### marital status: currently married as reference. 
+d['IRMARIT_binary'] = d['IRMARIT'].apply(lambda x: -1 if x == 1 else 1)
+
+
+## now remove columns that we do not use 
+d = d.drop(columns = ['IRMARIT', 'IREDUHIGHST2', 'CATAG6', 'INCOME', 'NEWRACE2', 'RSKYFQTES', 'year'])
+
 ## Q: some of these are likert (e.g. education)
 ## some are qualitative; how to treat them? 
 
 # for now only columns without nan 
 d_no_nan = d.loc[d.apply(lambda row: 0 not in row.values, axis=1)]
-d_no_nan # 167.585 rows 
-
-# drop the year column
-d_no_nan = d.drop(columns = ['year'])
 
 # save data 
 d_no_nan.to_csv('../data/replication/jones_nock_2022.csv', index = False)

@@ -14,6 +14,25 @@ d = d.replace(-1, 0)
 # consider major depression (lifetime) first
 d_life = d.drop(columns = {'AMDEYR'})
 
+# sample 30K (out of 168.016K)
+d_10k = d_life.sample(n = 10000)
+
+d_pred = d_life.drop(columns = {'AMDELT'})
+d_out = d_life['AMDELT']
+
+# 1.21 
+model = pm.Model(coords={"predictors": d_pred.columns.values})
+with model: 
+    alpha = pm.Normal("alpha", mu=0, sigma=5)
+    beta = pm.Normal("beta", mu=0, sigma=5, dims="predictors")
+    p = pm.Deterministic("p", pm.math.invlogit(alpha + at.dot(d_pred.values, beta)))
+    outcome = pm.Bernoulli("outcome", p, observed=d_out.values)
+with model: 
+    idata = pm.sample(return_inferencedata=True)
+
+# sample independently for the various cases
+## ...
+
 ## run just for some values of our 
 d_sub = d_life[d_life['IRSEX'] == 1]
 data_sub = d_sub[d_sub['CATAG6'] == 3]

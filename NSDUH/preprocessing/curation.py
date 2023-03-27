@@ -238,7 +238,7 @@ def data_to_mpf(d, conversion_dict, filename):
     bit_string = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in A]
     rows, cols = A.shape
     w = [str(1.0) for _ in range(cols)]
-    with open(f'../data/clean/{filename}.txt', 'w') as f:
+    with open(f'../data/clean_splits/{filename}.txt', 'w') as f:
         f.write(f'{rows}\n{cols}\n')
         for bit, weight in zip(bit_string, w): 
             f.write(f'{bit} {weight}\n')
@@ -263,6 +263,6 @@ for demographic_split in lst:
                   (d_LEQ5[variables[2]] == i[2]) & 
                   (d_LEQ5[variables[3]] == i[3]) & 
                   (d_LEQ5[variables[4]] == i[4]) & 
-                  (d_LEQ5[variables[5]] == i[5])]
+                  (d_LEQ5[variables[5]] == i[5])].drop(columns = variables)
     data_to_mpf(dsub, conversion_dict, f'NSDUH_full_{i[0]}_{i[1]}_{i[2]}_{i[3]}_{i[4]}_{i[5]}')
     

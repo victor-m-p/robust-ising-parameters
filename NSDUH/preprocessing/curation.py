@@ -32,8 +32,10 @@ columns_2016_2019 = [
     #'AGE2',
     'IRSEX',
     'IRMARIT',
-    'CATAGE',
+    'CATAG6',
     'NEWRACE2',
+    'IREDUHIGHST2', # education
+    'INCOME',
     # mental health / depression
     'SUICTHNK',
     'SUICPLAN',
@@ -49,8 +51,10 @@ conversion_new_to_old = {
     'PNRNMREC': 'ANALREC',
     'TRQNMREC': 'TRANREC',
     'STMNMREC': 'STIMREC',
-    'SEDNMREC': 'SEDREC'
+    'SEDNMREC': 'SEDREC',
+    'IREDUHIGHST2': 'IREDUC2'
 }
+
 columns_2008_2014 = [conversion_new_to_old.get(x, x) for x in columns_2016_2019]
 
 ## conversion from 2016-2019 to 2015
@@ -165,46 +169,100 @@ recode_distress = {
 }
 data_all_years['SPDYR'] = data_all_years['SPDYR'].replace(recode_distress).astype(int)
 
+# recode demographics 
+def split_likert_column(d, column): 
+    d_binary = d.groupby(column).size().reset_index(name='count')
+    d_binary = d_binary.sort_values(by = column)
+    d_binary['cumsum'] = d_binary['count'].cumsum()
+    # Calculate the total sum
+    total_sum = d_binary['count'].sum()
+    # Find the split point that minimizes the difference between the sums of the two groups
+    split_point = (d_binary['cumsum'] - total_sum / 2).abs().idxmin()
+    d_binary[f'{column}_binary'] = d_binary.index.to_series().apply(lambda x: -1 if x <= split_point else 1)
+    d_binary = d_binary[[column, f'{column}_binary']]
+    d_binary = d.merge(d_binary, on = column, how = 'inner')
+    return d_binary
+
+data_all_years = split_likert_column(data_all_years, 'IREDUHIGHST2') 
+data_all_years = split_likert_column(data_all_years, 'CATAG6')
+data_all_years = split_likert_column(data_all_years, 'INCOME')
+
+## check splits 
+### edata_all_yearsucation: splits between high-school and some college
+data_all_years.groupby(['IREDUHIGHST2', 'IREDUHIGHST2_binary']).size().reset_index(name='count')
+### age: splits [18:34] vs [35+] 
+data_all_years.groupby(['CATAG6', 'CATAG6_binary']).size().reset_index(name='count')
+### income: splits [<49.999] vs [>=50.000]
+data_all_years.groupby(['INCOME', 'INCOME_binary']).size().reset_index(name='count')
+
+## non-likert columns split manually 
+### gendata_all_yearser alreadata_all_yearsy data_all_yearsone 
+data_all_years['IRSEX_binary'] = data_all_years['IRSEX'].apply(lambda x: -1 if x == 1 else 1)
+### race (white vs. non-white) with white as reference
+data_all_years['NEWRACE2_binary'] = data_all_years['NEWRACE2'].apply(lambda x: -1 if x == 1 else 1)
+### marital status: currently married as reference. 
+data_all_years['IRMARIT_binary'] = data_all_years['IRMARIT'].apply(lambda x: -1 if x == 1 else 1)
+
+## now remove columns that we do not use 
+data_all_years = data_all_years.drop(columns = ['IRSEX', 'IRMARIT', 'IREDUHIGHST2', 'CATAG6', 'INCOME', 'NEWRACE2', 'year'])
+
 # filter demographics 
 ### IRSEX: 1 = Male, 2 = Female 
 ### IRMARIT/IRMARITSTAT: 1 = Married, ..., 4 = Never
 ### CATAGE: 3 = 26-34, ...
 ### NEWRACE2: 1 = White (non-hispanic), ...
-data_all_years.to_csv('../data/reference/NSDUH_pre_demographics.csv', index=False)
-len(data_all_years) # 674.521
-data_subset = data_all_years[data_all_years['IRSEX'] == 1]
-len(data_subset) # 322.636
-data_subset = data_subset[data_subset['CATAGE'] == 3]
-len(data_subset) # 39.472
-data_subset = data_subset[data_subset['NEWRACE2'] == 1]
-len(data_subset) # 23.516
+#data_all_years.to_csv('../data/reference/NSDUH_pre_demographics.csv', index=False)
+#len(data_all_years) # 674.521
+#data_subset = data_all_years[data_all_years['IRSEX'] == 1]
+#len(data_subset) # 322.636
+#data_subset = data_subset[data_subset['CATAGE'] == 3]
+#len(data_subset) # 39.472
+#data_subset = data_subset[data_subset['NEWRACE2'] == 1]
+#len(data_subset) # 23.516
 
 # now get rid of demographics & filedate
-data_subset = data_subset.drop(columns = ['IRSEX', 'CATAGE', 
-                                          'NEWRACE2', 'IRMARIT', 
-                                          'SUICPLAN', 'SUICTRY',
-                                          'year'])
+#data_subset = data_subset.drop(columns = ['IRSEX', 'CATAGE', 
+#                                          'NEWRACE2', 'IRMARIT', 
+#                                          'SUICPLAN', 'SUICTRY',
+#                                          'year'])
 
 # remove the two crazy columns 
-zero_counts = (data_subset == 0).sum(axis=1)
-d_LEQ5 = data_subset[zero_counts <= 5]
-
-# randomly scramble rows
-d_LEQ5 = d_LEQ5.sample(frac=1).reset_index(drop=True)
-d_LEQ5.to_csv('../data/reference/NSDUH_2008_2019_NAN5_SUIC.csv', index=False)
+zero_counts = (data_all_years == 0).sum(axis=1)
+d_LEQ5 = data_all_years[zero_counts <= 5]
 
 # put it in the MPF format and save 
-A_LEQ5 = d_LEQ5.to_numpy()
+def data_to_mpf(d, conversion_dict, filename): 
+    d = d.sample(frac=1).reset_index(drop=True)
+    d.to_csv(f'../data/reference/{filename}.csv', index=False)
+    A = d.to_numpy()
+    bit_string = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in A]
+    rows, cols = A.shape
+    w = [str(1.0) for _ in range(cols)]
+    with open(f'../data/clean/{filename}.txt', 'w') as f:
+        f.write(f'{rows}\n{cols}\n')
+        for bit, weight in zip(bit_string, w): 
+            f.write(f'{bit} {weight}\n')
+
 conversion_dict = {
     '-1': '0',
     '0': 'X',
     '1': '1'
 }
 
-bit_string = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in A_LEQ5]
-w = np.ones(len(A_LEQ5))
-rows, cols = A_LEQ5.shape
-with open('../data/clean/NSDUH_2008_2019_NAN5_SUIC.txt', 'w') as f: 
-    f.write(f'{rows}\n{cols}\n')
-    for bit, weight in zip(bit_string, w): 
-        f.write(f'{bit} {weight}\n')
+data_to_mpf(d_LEQ5, conversion_dict, 'NSDUH_full')
+
+# all combinations of the columns we want to vary 
+import itertools 
+lst = list(itertools.product([-1, 1], repeat=6))
+variables = ['IREDUHIGHST2_binary', 'CATAG6_binary', 'INCOME_binary', 'IRSEX_binary', 'IRMARIT_binary', 'NEWRACE2_binary']
+
+for demographic_split in lst:
+    i = list(demographic_split)
+    dsub = d_LEQ5[(d_LEQ5[variables[0]] == i[0]) & 
+                  (d_LEQ5[variables[1]] == i[1]) & 
+                  (d_LEQ5[variables[2]] == i[2]) & 
+                  (d_LEQ5[variables[3]] == i[3]) & 
+                  (d_LEQ5[variables[4]] == i[4]) & 
+                  (d_LEQ5[variables[5]] == i[5])]
+    data_to_mpf(dsub, conversion_dict, f'NSDUH_full_{i[0]}_{i[1]}_{i[2]}_{i[3]}_{i[4]}_{i[5]}')
+    

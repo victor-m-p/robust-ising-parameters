@@ -163,9 +163,8 @@ d['NEWRACE2_binary'] = d['NEWRACE2'].apply(lambda x: -1 if x == 1 else 1)
 ### marital status: currently married as reference. 
 d['IRMARIT_binary'] = d['IRMARIT'].apply(lambda x: -1 if x == 1 else 1)
 
-
 ## now remove columns that we do not use 
-d = d.drop(columns = ['IRMARIT', 'IREDUHIGHST2', 'CATAG6', 'INCOME', 'NEWRACE2', 'RSKYFQTES', 'year'])
+d = d.drop(columns = ['IRSEX', 'IRMARIT', 'IREDUHIGHST2', 'CATAG6', 'INCOME', 'NEWRACE2', 'RSKYFQTES', 'year'])
 
 ## Q: some of these are likert (e.g. education)
 ## some are qualitative; how to treat them? 

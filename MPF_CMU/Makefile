@@ -1,14 +1,14 @@
 SHELL=/bin/bash
 
-# for mac...
+# for ubuntu
 CC=gcc
 CFLAGS=-O3 -fopenmp 
 LFLAGS=-lm `gsl-config --libs`
 
 # for Ganesha
-# CC=gcc
-# CFLAGS=-O3 -fopenmp `gsl-config --cflags`
-# LFLAGS=`gsl-config --libs`
+#CC=gcc
+#CFLAGS=-O3 -fopenmp `gsl-config --cflags`
+#LFLAGS=`gsl-config --libs`
 
 # for PSC with GCC
 # run `module load gcc` first!
@@ -23,7 +23,8 @@ LFLAGS=-lm `gsl-config --libs`
 
 # for PSC with AMD compiler
 # time tests suggest that AMD is 10%±2% faster than GCC
-# run `module load aocc aocl` first!
+# run `source /opt/packages/aocl/4.0/amd-libs.cfg`
+# then run `module load aocc aocl` first!
 # CC=clang
 # CFLAGS=-O3 -zopt -fopenmp
 # LFLAGS=-unroll-aggressive -lalm -lm `gsl-config --libs`
@@ -48,3 +49,4 @@ nsb.o: nsb.c
 clean:
 	rm -f *.o
 	rm -f mpf
+	

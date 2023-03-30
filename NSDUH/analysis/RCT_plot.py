@@ -51,3 +51,15 @@ d_treatment = d[d['exp_type'] == 'Treatment']
 sns.lineplot(d_treatment['t'],
              d_treatment['fraction_outcome'],
              hue=d_treatment['condition'])
+
+## (1) The probabilistic notion
+burials_gravegoods_agg['difference'] = burials_gravegoods_agg['outcome'] / burials_gravegoods_agg['outcome_baseline']
+fig, ax = plt.subplots()
+sns.lineplot(data=burials_gravegoods_agg,
+             x='timestep',
+             y='difference',
+             hue='identifier')
+plt.ylabel('P(Y=1|condition) / P(Y=1|baseline)')
+plt.suptitle('Formal Burials ON Grave Goods')
+ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+plt.savefig('../fig/intervention/divide_burials_gravegoods.png', bbox_inches='tight')

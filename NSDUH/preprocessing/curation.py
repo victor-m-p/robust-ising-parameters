@@ -38,8 +38,8 @@ columns_2016_2019 = [
     'INCOME',
     # mental health / depression
     'SUICTHNK',
-    'SUICPLAN',
-    'SUICTRY',
+    #'SUICPLAN', # could cut
+    #'SUICTRY', # could cut 
     'AMDEYR',
     'SPDYR'
 ]
@@ -150,7 +150,7 @@ recode_suicide = {
     99: 0, # D/K (legitimate skip)
 }
 
-suicide_cols = ['SUICTHNK', 'SUICPLAN', 'SUICTRY']
+suicide_cols = 'SUICTHNK' # ['SUICTHNK', 'SUICPLAN', 'SUICTRY']
 data_all_years[suicide_cols] = data_all_years[suicide_cols].replace(recode_suicide)
 
 ## major depression (AMDEYR)
@@ -231,14 +231,14 @@ zero_counts = (data_all_years == 0).sum(axis=1)
 d_LEQ5 = data_all_years[zero_counts <= 5]
 
 # put it in the MPF format and save 
-def data_to_mpf(d, conversion_dict, filename): 
+def data_to_mpf(d, conversion_dict, foldername, filename): 
     d = d.sample(frac=1).reset_index(drop=True)
     d.to_csv(f'../data/reference/{filename}.csv', index=False)
     A = d.to_numpy()
     bit_string = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in A]
     rows, cols = A.shape
-    w = [str(1.0) for _ in range(cols)]
-    with open(f'../data/clean_splits/{filename}.txt', 'w') as f:
+    w = [str(1.0) for _ in range(rows)]
+    with open(f'../data/{foldername}/{filename}.txt', 'w') as f:
         f.write(f'{rows}\n{cols}\n')
         for bit, weight in zip(bit_string, w): 
             f.write(f'{bit} {weight}\n')
@@ -249,7 +249,7 @@ conversion_dict = {
     '1': '1'
 }
 
-data_to_mpf(d_LEQ5, conversion_dict, 'NSDUH_full')
+data_to_mpf(d_LEQ5, conversion_dict, 'mpf_format', 'NSDUH_full')
 
 # all combinations of the columns we want to vary 
 import itertools 
@@ -264,5 +264,5 @@ for demographic_split in lst:
                   (d_LEQ5[variables[3]] == i[3]) & 
                   (d_LEQ5[variables[4]] == i[4]) & 
                   (d_LEQ5[variables[5]] == i[5])].drop(columns = variables)
-    data_to_mpf(dsub, conversion_dict, f'NSDUH_full_{i[0]}_{i[1]}_{i[2]}_{i[3]}_{i[4]}_{i[5]}')
+    data_to_mpf(dsub, conversion_dict, 'mpf_format_splits', f'NSDUH_full_{i[0]}_{i[1]}_{i[2]}_{i[3]}_{i[4]}_{i[5]}')
     

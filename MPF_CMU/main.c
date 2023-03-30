@@ -1,6 +1,7 @@
 #include "mpf.h"
-// mpf -l [filename] [logsparsity] // load in data, fit
-// mpf -c [filename] // load in data, fit, using cross-validation to pick best sparsity
+// mpf -l [filename] [logsparsity] [p norm (optional)] // load in data, fit
+// mpf -c [filename] [p norm (optional)] // load in data, fit, using cross-validation to pick best sparsity
+// if [p norm] is specified, it will determine the exponent in the sparsity norm; the default is p=2 (Gaussian prior on coefficients); p=1 will select the Exponential (LASSO) prior on coefficients
 // mpf -g [filename] [n_nodes] [n_obs] [beta] // generate data, save both parameters and data to files
 // mpf -t [filename] [paramfile] [NN] // load in test data, fit, get KL divergence from truth
 // mpf -o [filename_prefix] [NN] // load in data (_data.dat suffix), find best lambda using _params.dat to determine KL
@@ -8,7 +9,7 @@
 // mpf -z [paramfile] [n_nodes]  // print out probabilities of all configurations under paramfile
 
 int main (int argc, char *argv[]) {
-	double t0, beta, *big_list, *truth, *inferred, logl_ans, glob_nloops, best_log_sparsity, kl_cv, kl_cv_sp, kl_true, kl_true_sp, ent, *best_fit;
+	double t0, running_logl, beta, *big_list, *truth, *inferred, logl_ans, glob_nloops, best_log_sparsity, kl_cv, kl_cv_sp, kl_true, kl_true_sp, ent, *best_fit;
 	all *data;
 	int i, n, nn, thread_id, last_pos, in, j, count, pos, n_obs, n_nodes, kfold, num_no_na, tot_uniq, has_nans;
 	sample *sav, **sav_list;
@@ -33,6 +34,13 @@ int main (int argc, char *argv[]) {
 						
 			init_params(data);
 			data->log_sparsity=atof(argv[3]);
+			if (argc == 5) {
+				data->p_norm=atof(argv[4]);
+				printf("P norm set; p=%lf\n", data->p_norm);
+			} else {
+				data->p_norm=2.0;
+				printf("P norm default; p=%lf\n", data->p_norm);
+			}
 			create_near(data, 1); 
 			
 			printf("%i data vectors; %i total; %i NNs\n", data->uniq, data->n_all, data->near_uniq);
@@ -55,7 +63,18 @@ int main (int argc, char *argv[]) {
 				fprintf(fp, "%.10e ", data->big_list[j]);
 			}
 		    fclose(fp);
-						
+			
+			running_logl=0;
+			for(i=0;i<data->uniq;i++) {
+				config=0;
+				for(j=0;j<data->n;j++) {
+					if (data->obs[i]->config_base[j] > 0) {
+						config += (1 << j);
+					}
+				}
+				running_logl += data->obs[i]->mult*log_l(data, config, data->big_list, data->obs[i]->n_blanks, data->obs[i]->blanks);
+			}
+			printf("Total LogL for data, given parameters: %lf\n", running_logl);
 		}
 
 		if (argv[1][1] == 'c') { // cross validation
@@ -65,11 +84,19 @@ int main (int argc, char *argv[]) {
 			read_data(argv[2], data);
 			best_fit=NULL;
 			nn=data->n; // number of nodes -- save this
-			
+						
 			cv=(cross_val *)malloc(sizeof(cross_val));
 			cv->filename=argv[2];
 			cv->nn=nn; // atoi(argv[3]);
 			cv->best_fit=best_fit;
+			
+			if (argc == 4) {
+				cv->p_norm=atof(argv[3]);
+				printf("P norm set; p=%lf\n", cv->p_norm);
+			} else {
+				cv->p_norm=2.0;
+				printf("P norm default; p=%lf\n", cv->p_norm);
+			}
 			best_log_sparsity=minimize_kl(cv, 0); // don't use fast version, just for safety
 						
 			printf("Best log_sparsity: %lf\n", best_log_sparsity);
@@ -77,6 +104,8 @@ int main (int argc, char *argv[]) {
 			data=new_data();
 			read_data(argv[2], data);
 			data->best_fit=best_fit; // will either be NULL (for the no NAN case, or the saved values)
+			data->p_norm=cv->p_norm;
+			
 			process_obs_raw(data);
 						
 			init_params(data);
@@ -103,6 +132,17 @@ int main (int argc, char *argv[]) {
 			}
 		    fclose(fp);	
 			
+			running_logl=0;
+			for(i=0;i<data->uniq;i++) {
+				config=0;
+				for(j=0;j<data->n;j++) {
+					if (data->obs[i]->config_base[j] > 0) {
+						config += (1 << j);
+					}
+				}
+				running_logl += data->obs[i]->mult*log_l(data, config, data->big_list, data->obs[i]->n_blanks, data->obs[i]->blanks);
+			}
+			printf("Total LogL for data, given parameters: %lf\n", running_logl);
 		}
 
 		if (argv[1][1] == 'o') { // optimal lambda -- to be written

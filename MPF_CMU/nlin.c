@@ -11,7 +11,7 @@ double cross_holder(double log_sparsity, void *params) {
 	cross_val *cv;
 	
 	cv=(cross_val *)params;
-	return -cross(cv->filename, log_sparsity, cv->nn, cv->best_fit);
+	return -cross(cv, log_sparsity);
 }
 
 double kl_holder(double log_sparsity, void *params) {
@@ -41,7 +41,7 @@ double minimize_kl_true(cross_val *cv) {
   gsl_min_fminimizer *s;
   
   double m = 1.0;
-  double a = -2.0, b = 4.0;
+  double a = -4.0, b = 4.0;
   gsl_function F;
 
   F.function = &kl_holder;
@@ -98,7 +98,7 @@ double minimize_kl(cross_val *cv, int fast_version) {
   gsl_min_fminimizer *s;
   
   double m = 1.0;
-  double a = -2.0, b = 4.0;
+  double a = -4.0, b = 3.0;
   gsl_function F;
 
   F.function = &cross_holder;
@@ -111,6 +111,7 @@ double minimize_kl(cross_val *cv, int fast_version) {
   } else {
 	  T=gsl_min_fminimizer_goldensection;  	
   }
+  T=gsl_min_fminimizer_brent;
   s = gsl_min_fminimizer_alloc (T);
   gsl_min_fminimizer_set(s, &F, m, a, b);
 
@@ -133,7 +134,7 @@ double minimize_kl(cross_val *cv, int fast_version) {
       b = gsl_min_fminimizer_x_upper (s);
 
       status
-        = gsl_min_test_interval (a, b, 0.001, 0.0);
+        = gsl_min_test_interval (a, b, 0.01, 0.0);
 
       if (status == GSL_SUCCESS)
         printf ("Converged:\n");

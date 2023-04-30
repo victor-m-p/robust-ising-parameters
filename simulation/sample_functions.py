@@ -13,29 +13,9 @@ from tqdm import tqdm
 import random 
 import string 
 
-# taken from coniii enumerate
-def fast_logsumexp(X, coeffs=None):
-    """correlation calculation in Ising equation
-
-    Args:
-        X (np.Array): terms inside logs
-        coeffs (np.Array, optional): factors in front of exponential. Defaults to None.
-
-    Returns:
-        float: sum of exponentials
-    """
-    Xmx = max(X)
-    if coeffs is None:
-        y = np.exp(X-Xmx).sum()
-    else:
-        y = np.exp(X-Xmx).dot(coeffs)
-
-    if y<0:
-        return np.log(np.abs(y))+Xmx, -1.
-    return np.log(y)+Xmx, 1.
-
-# still create J_combinations is slow for large number of nodes
-def p_dist(h, J):
+# basic simulation functions 
+def ising_probs(h: np.array, 
+                J: np.array):
     """return probabilities for 2**h states
 
     Args:
@@ -45,34 +25,140 @@ def p_dist(h, J):
     Returns:
         np.Array: probabilities for all configurations
     """
-    n_nodes = len(h)
-    hJ = np.concatenate((h, J))
-    h_combinations = np.array(list(itertools.product([1, -1], repeat = n_nodes)))
+    
+    # all h combinations
+    h_combinations = np.array(list(itertools.product([1, -1], repeat = len(h))))
+    
+    # all J combinations
     J_combinations = np.array([list(itertools.combinations(i, 2)) for i in h_combinations])
     J_combinations = np.add.reduce(J_combinations, 2)
     J_combinations[J_combinations != 0] = 1
     J_combinations[J_combinations == 0] = -1
-    condition_arr = np.concatenate((h_combinations, J_combinations), axis = 1)
-    flipped_arr = hJ * condition_arr
-    summed_arr = np.sum(flipped_arr, axis = 1)
-    logsumexp_arr = fast_logsumexp(summed_arr)[0]
-    Pout = np.exp(summed_arr - logsumexp_arr)
-    return Pout[::-1]
+    
+    # create condition array 
+    condition_array = np.concatenate((J_combinations, h_combinations), axis = 1)
+    
+    # run the calculations
+    Jh = np.concatenate((J, h))
+    inner_sums = Jh * condition_array 
+    total_sums = np.sum(inner_sums, axis = 1)
+    exponent_sums = np.exp(total_sums)
+    Z = np.sum(exponent_sums)
+    p = exponent_sums / Z
+    return p[::-1] # reverse because states ascending  
 
-def bin_states(n, sym=True):
+def bin_states(n: int):
     """generate 2**n possible configurations
-
+    
     Args:
         n (int): number of questions (features)
-        sym (bool, optional): symmetric system. Defaults to True.
-
     Returns:
+    
         np.Array: 2**n configurations 
     """
     v = np.array([list(np.binary_repr(i, width=n)) for i in range(2**n)]).astype(int)
-    if sym is False:
-        return v
     return v*2-1
+
+def recode(x): 
+    '''
+    recode from 0/1 to 1/-1
+    '''
+    return x*2-1
+
+def expnorm(x):
+    '''
+    from h to probability 
+    '''
+    return np.exp(x) / (np.exp(x) + np.exp(-x))
+
+# sample functions 
+def sample_not_connected(n_samples: int,
+                         h_hidden: np.array,
+                         h_visible: np.array,
+                         J_interlayer: np.array):
+    
+    # calculate basic stuff 
+    n_visible = len(h_visible)
+    n_hidden = len(h_hidden)
+    
+    # probability of hidden nodes being on/off
+    prob_hidden = np.array(list(map(expnorm, h_hidden)))
+    
+    # sample array 
+    samples = np.zeros((n_samples, n_hidden + n_visible))
+    
+    # sample hidden & recode to 1/-1
+    for i in range(n_samples): 
+        samp_hidden = np.random.binomial(1, prob_hidden)
+        samp_hidden = recode(samp_hidden)
+
+        # sample visible & recode to 1/-1
+        samp_h_visible = h_visible + np.sum(samp_hidden * J_interlayer, axis=1)
+        samp_visible = np.random.binomial(1, expnorm(samp_h_visible))
+        samp_visible = recode(samp_visible)
+        
+        samples[i] = np.concatenate((samp_hidden, samp_visible))
+    return samples 
+
+def sample_hidden_connected(n_samples: int,
+                            h_hidden: np.array,
+                            J_hidden: np.array,
+                            h_visible: np.array,
+                            J_interlayer: np.array):
+    
+    # calculate basic stuff 
+    n_visible = len(h_visible)
+    n_hidden = len(h_hidden)
+    
+    # probability of hidden nodes being on/off 
+    p_hidden = ising_probs(h_hidden, J_hidden)
+    
+    # all possible states for hidden nodes
+    hidden_states = bin_states(n_hidden)
+    n_hidden_states = len(hidden_states)
+    
+    # sample array 
+    samples = np.zeros((n_samples, n_hidden + n_visible))
+
+    # sample hidden & recode to 1/-1
+    for i in range(n_samples): 
+        samp_hidden = hidden_states[np.random.choice(a=np.arange(n_hidden_states), p=p_hidden)]        
+
+        # sample visible & recode to 1/-1
+        samp_h_visible = h_visible + np.sum(samp_hidden * J_interlayer, axis=1)
+        samp_visible = np.random.binomial(1, expnorm(samp_h_visible))
+        samp_visible = recode(samp_visible)
+
+        # concatenate
+        samples[i] = np.concatenate((samp_hidden, samp_visible))
+        
+    return samples 
+
+def sample_fully_connected(n_samples: int,
+                           h: np.array,
+                           J: np.array):
+    
+    # calculate basic stuff
+    n_nodes = len(h)
+    
+    # probability of hidden nodes being on/off 
+    p = ising_probs(h, J)
+    
+    # all possible states for hidden nodes
+    states = bin_states(n_nodes)
+    n_states = len(states)
+    
+    # sample array 
+    samples = np.zeros((n_samples, n_nodes))
+
+    # sample hidden & recode to 1/-1
+    for i in range(n_samples): 
+        samples[i] = states[np.random.choice(a=np.arange(n_states), p=p)]
+
+    return samples 
+
+######### general functions #########
+######### if this exists somewhere else then delete #########
 
 # '''https://stackoverflow.com/questions/42752610/python-how-to-generate-the-pairwise-hamming-distance-matrix'''
 def hamming_distance(X):

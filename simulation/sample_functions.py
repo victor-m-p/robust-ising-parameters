@@ -98,7 +98,7 @@ def sample_not_connected(n_samples: int,
         samp_visible = recode(samp_visible)
         
         samples[i] = np.concatenate((samp_hidden, samp_visible))
-    return samples 
+    return samples.astype(int)
 
 def sample_hidden_connected(n_samples: int,
                             h_hidden: np.array,
@@ -132,7 +132,7 @@ def sample_hidden_connected(n_samples: int,
         # concatenate
         samples[i] = np.concatenate((samp_hidden, samp_visible))
         
-    return samples 
+    return samples.astype(int) 
 
 def sample_fully_connected(n_samples: int,
                            h: np.array,
@@ -155,7 +155,25 @@ def sample_fully_connected(n_samples: int,
     for i in range(n_samples): 
         samples[i] = states[np.random.choice(a=np.arange(n_states), p=p)]
 
-    return samples 
+    return samples.astype(int)
+
+# saving samples to mpf readable format
+def save_to_mpf(simulation_matrix, conversion_dict, outname, weight_list = []): 
+
+    # convert to bitstring in mpf format
+    bitstring_list = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in simulation_matrix]
+
+    # extract shape
+    rows, cols = simulation_matrix.shape
+    
+    # if weight_list is empty then fill with ones 
+    if not weight_list: 
+        weight_list = np.ones(rows)
+    
+    with open(f'{outname}', 'w') as f: 
+        f.write(f'{rows}\n{cols}\n')
+        for bit, weight in zip(bitstring_list, weight_list): 
+            f.write(f'{bit} {weight}\n')
 
 ######### general functions #########
 ######### if this exists somewhere else then delete #########

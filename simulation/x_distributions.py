@@ -8,16 +8,14 @@ import numpy as np
 from sample_functions import sample_not_connected, sample_hidden_connected, sample_fully_connected
 import matplotlib.pyplot as plt 
 import seaborn as sns 
+import pandas as pd 
+
+##### 1. ALL GAUSSIAN #####
 
 # overall params (maximum 11 nodes) 
-n_hidden = [1, 2, 3]
-n_visible = [2, 4, 8]
-n_simulations = 500 # ballpark for DRH data 
-
-# loop over different combinations 
-for n_hidden, n_visible in zip(n_hidden, n_visible):
-    print(n_hidden)
-    print(n_visible)
+n_hidden = 5
+n_visible = 10
+n_simulations = 1000 # ballpark for DRH data 
 
 # set up data for the independent model
 h_hidden = np.random.normal(0, 1, n_hidden) 
@@ -32,14 +30,6 @@ n_nodes = n_hidden + n_visible
 h = np.random.normal(0, 1, n_nodes)
 J = np.random.normal(0, 1, int(n_nodes*(n_nodes-1)/2))
 
-# but still very few ACTUALLY zero; 
-# this still bothers me a bit actually. 
-# how do I get this thing to give me zeros? 
-sns.kdeplot(np.random.laplace(0, 0.5, 1000))
-
-
-
-
 # sample from model that is independent in both layers
 sim_not_connected = sample_not_connected(
     n_simulations, 
@@ -47,6 +37,7 @@ sim_not_connected = sample_not_connected(
     h_visible, 
     J_interlayer
     )
+sim_not_connected_visible = sim_not_connected[:, n_hidden:]
 
 # from model that is connected in hidden layer but independent in visible layer
 sim_hidden_connected = sample_hidden_connected(
@@ -56,6 +47,7 @@ sim_hidden_connected = sample_hidden_connected(
     h_visible,
     J_interlayer
 )
+sim_hidden_connected_visible = sim_hidden_connected[:, n_hidden:]
 
 # sample from the model that is connected in both layers
 sim_fully_connected = sample_fully_connected(
@@ -63,16 +55,62 @@ sim_fully_connected = sample_fully_connected(
     h,
     J
 )
+sim_fully_connected_visible = sim_fully_connected[:, n_hidden:]
 
-# test correspondence (they should not correspond in this case)
-## mean: all different
-np.mean(sim_not_connected, axis=0)
-np.mean(sim_hidden_connected, axis=0) 
-np.mean(sim_fully_connected, axis=0) 
-## correlation: all different 
-np.corrcoef(sim_not_connected, rowvar=False)
-np.corrcoef(sim_hidden_connected, rowvar=False)
-np.corrcoef(sim_fully_connected, rowvar=False) # we can get nan here if all a node is always on or off
+# check means for visible layer 
+h_mean_not_connected = np.mean(sim_not_connected_visible, axis=0) 
+h_mean_hidden_connected = np.mean(sim_hidden_connected_visible, axis=0)
+h_mean_fully_connected = np.mean(sim_fully_connected_visible, axis=0)
 
-# convert to MPF format 
+model = ['independent']*n_visible + ['hidden']*n_visible + ['fully']*n_visible
+means = np.concatenate((h_mean_not_connected, h_mean_hidden_connected, h_mean_fully_connected))
 
+d = pd.DataFrame({
+    'model': model,
+    'mean': means
+})
+
+fig, ax = plt.subplots()
+sns.boxplot(data=d, x = 'mean', y='model', hue = 'model')
+ax.get_legend().remove()
+plt.show()
+
+# check correlations between visible nodes 
+## how do we extract what we actually need here?
+corr_indices = np.triu_indices(n_visible, k =1)
+
+corr_not_connected = np.corrcoef(sim_not_connected_visible, rowvar=False)
+corr_not_connected = corr_not_connected[corr_indices]
+
+corr_hidden_connected = np.corrcoef(sim_hidden_connected_visible, rowvar=False)
+corr_hidden_connected = corr_hidden_connected[corr_indices]
+
+corr_fully_connected = np.corrcoef(sim_fully_connected_visible, rowvar=False)
+corr_fully_connected = corr_fully_connected[corr_indices]
+
+model = ['independent']*int(n_visible*(n_visible-1)/2) + ['hidden']*int(n_visible*(n_visible-1)/2) + ['fully']*int(n_visible*(n_visible-1)/2)
+correlations = np.concatenate((corr_not_connected, corr_hidden_connected, corr_fully_connected))
+
+d = pd.DataFrame({
+    'model': model,
+    'corr': correlations
+})
+
+fig, ax = plt.subplots()
+sns.boxplot(data=d, x = 'corr', y='model', hue = 'model')
+ax.get_legend().remove()
+plt.show()
+
+'''
+basically in the cases where we only have 
+hidden -> visible connections, the correlations
+can vanish (I think). I am not sure why this 
+does not happen in the fully connected case. 
+you would think that they would still tend to 
+cancel out, but I guess the dynamics just become
+really interesting in that case. 
+'''
+
+##### 1. h: Gaussian, J: Laplace #####
+# we can look at this later
+# ... 

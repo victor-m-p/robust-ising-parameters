@@ -146,17 +146,16 @@ sim_fully_connected = sample_fully_connected(
     h,
     J
 )
-sim_visible_connected = sim_fully_connected[:, 2:]
 
 # test correspondence
 ## mean: all the same 
 np.mean(sim_not_connected, axis=0)
 np.mean(sim_hidden_connected, axis=0) 
-np.mean(sim_visible_connected, axis=0) 
+np.mean(sim_fully_connected, axis=0) 
 ## correlation: all the same  
 np.corrcoef(sim_not_connected, rowvar=False)
 np.corrcoef(sim_hidden_connected, rowvar=False)
-np.corrcoef(sim_visible_connected, rowvar=False) 
+np.corrcoef(sim_fully_connected, rowvar=False) 
 
 # test speed 
 timeit.timeit('sample_not_connected(n_simulations, h_hidden, h_visible, J_interlayer)', 

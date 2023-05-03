@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VENVNAME=glassenv
+VENVNAME=robustenv
 
 python3 -m venv $VENVNAME
 source $VENVNAME/bin/activate

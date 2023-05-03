@@ -19,21 +19,25 @@ conversion_dict = {
 # meta settings
 outpath_true = 'data/not_connected_true/'
 outpath_mpf = 'data/not_connected_mpf/'
-h_type = 'gaussian01'
-J_type = 'gaussian01'
+h_type = 'gaussian'
+J_type = 'gaussian'
+h_mean = 0.0
+h_std = 0.5
+J_mean = 0.0
+J_std = 0.5
 
-# overall params (maximum 11 nodes) 
-n_hidden = 2 
+# overall params 
 n_visible = 4
-list_hidden_implied = [0, 2, 4]
-n_simulations = 500 
+n_hidden = 2
+list_hidden_implied = [2]
+n_sim = 500 
 
 # loop over different combinations 
 
 # set up data for the independent model
-h_hidden = np.random.normal(0, 1, n_hidden) 
-h_visible = np.random.normal(0, 1, n_visible)  
-J_interlayer = np.random.normal(0, 1, (n_visible, n_hidden))
+h_hidden = np.random.normal(h_mean, h_std, n_hidden) 
+h_visible = np.random.normal(h_mean, h_std, n_visible)  
+J_interlayer = np.random.normal(J_mean, J_std, (n_visible, n_hidden))
 
 # save the true parameters in mpf compatible format 
 # including the implied parameters that we do not observe?
@@ -49,35 +53,35 @@ J = np.concatenate((J_hidden, J_interlayer_flat, J_visible))
 
 ## concatenate mpf style 
 Jh = np.concatenate((J, h))
-np.savetxt(f'{outpath_true}format_Jh_nhid_{n_hidden}_nvis_{n_visible}_th_{h_type}_tj_{J_type}.txt',
+np.savetxt(f'{outpath_true}format_Jh_nhid_0_nvis_{n_nodes}_th_{h_type}_{h_mean}_{h_std}_tj_{J_type}_{J_mean}_{J_std}_nsim_{n_sim}.txt',
            Jh) 
 
-# sample from model that is independent in both layers
-sim_not_connected = sample_not_connected(
-    n_simulations, 
+sim = sample_not_connected(
+    n_sim, 
     h_hidden, 
     h_visible, 
     J_interlayer
     )
 
 # this we save both in regular and mpf compatible format  
-np.savetxt(f'{outpath_true}sim_true_nhid{n_hidden}_nvis_{n_visible}_th_{h_type}_tj_{J_type}.txt',
-           sim_not_connected,
+np.savetxt(f'{outpath_true}sim_true_nhid_0_nvis_{n_nodes}_th_{h_type}_{h_mean}_{h_std}_tj_{J_type}_{J_mean}_{J_std}_nsim_{n_sim}.txt',
+           sim,
            fmt='%d') 
 
-save_to_mpf(sim_not_connected,
+save_to_mpf(sim,
             conversion_dict,
-            f'{outpath_mpf}sim_vis_mpf_nhid_{n_hidden}_nvis_{n_visible}_th_{h_type}_tj_{J_type}.txt')
+            f'{outpath_mpf}sim_vis_mpf_nhid_0_nvis_{n_nodes}_th_{h_type}_{h_mean}_{h_std}_tj_{J_type}_{J_mean}_{J_std}_nsim_{n_sim}.txt')
 
 # now for different number of implied hidden nodes 
-sim_visible = sim_not_connected[:, n_hidden:]
+n_visible=n_nodes-n_hidden
+sim_visible = sim[:, n_hidden:]
 
 # loop over different "proposals" for number of hidden nodes
-for i in list_hidden_implied: 
+for i in list_hidden_implied:
     # imply a certain number of hidden nodes
-    sample_i_implied = np.concatenate((np.zeros((n_simulations, i)), sim_visible), axis=1)
+    sample_i_implied = np.concatenate((np.zeros((n_sim, i)), sim_visible), axis=1)
     
     # reformat to mpf compatible format 
     save_to_mpf(sample_i_implied, 
                 conversion_dict, 
-                f'{outpath_mpf}sim_hid_mpf_nhid_{i}_nvis_{n_visible}_th_{h_type}_tj_{J_type}.txt')
+                f'{outpath_mpf}sim_hid_mpf_nhid_{i}_nvis_{n_visible}_th_{h_type}_{h_mean}_{h_std}_tj_{J_type}_{J_mean}_{J_std}_nsim_{n_sim}.txt')

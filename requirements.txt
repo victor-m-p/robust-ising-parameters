@@ -11,3 +11,6 @@ unidecode
 ptitprince
 geopandas
 xlrd
+multiprocess
+numba
+mpmath

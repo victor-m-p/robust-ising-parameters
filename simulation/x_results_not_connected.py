@@ -1,57 +1,82 @@
 '''
-MPF_CMU/sim_not_connected.sh
+MPF_CMU/sim_fully_connected.sh
 '''
 
 import re
 import os 
 import numpy as np 
+import matplotlib.pyplot as plt 
+from plot_functions import plot_params, plot_h_hidden
 
-# extraction regex 
+# setup 
+figpath = 'fig/not_connected/'
 path_mpf = 'data/not_connected_mpf/'
-param_files = [x for x in os.listdir(path_mpf) if x.endswith('.dat')]
-
-for filename in param_files: 
-    condition, hidden, visible, hdist, Jdist = re.findall(r'sim_(\w+)_mpf_nhid_(\d+)_nvis_(\d+)_th_(\w+)_tj_(\w+)', filename)[0]
-    n_nodes = int(hidden) + int(visible)
-
-# do it for an example first 
-## first get the simulated params 
-n_nodes = 6
-nJ = int(n_nodes*(n_nodes-1)/2)
-
-#### both hidden
-filename = param_files[0]
-condition, hidden, visible, hdist, Jdist = re.findall(r'sim_(\w+)_mpf_nhid_(\d+)_nvis_(\d+)_th_(\w+)_tj_(\w+)', filename)[0]
-Jh = np.loadtxt(f'{path_mpf}{filename}')
-J_hidden = Jh[:nJ]
-h_hidden = Jh[nJ:]
-
-#### both visible 
-filename = param_files[2]
-condition, hidden, visible, hdist, Jdist = re.findall(r'sim_(\w+)_mpf_nhid_(\d+)_nvis_(\d+)_th_(\w+)_tj_(\w+)', filename)[0]
-Jh = np.loadtxt(f'{path_mpf}{filename}')
-J_visible = Jh[:nJ]
-h_visible = Jh[nJ:]
-
-#### true params 
 path_true = 'data/not_connected_true/'
-hJ_true = np.loadtxt(f'{path_true}format_hJ_nhid_{hidden}_nvis_{visible}_th_{hdist}_tj_{Jdist}.txt')
-h_true = hJ_true[:n_nodes]
-J_true = hJ_true[n_nodes:]
 
-h_true
-h_visible # this should match almost perfectly 
-h_hidden
+# load mpf 
+param_files = [x for x in os.listdir(path_mpf) if x.endswith('.dat')]
+h_dict_mpf = {}
+J_dict_mpf = {}
+reg = r'sim_(\w+)_mpf_nhid_(\d+)_nvis_(\d+)_th_(\w+)_(\w+.\w+)_(\w+.\w+)_tj_(\w+)_(\w+.\w+)_(\w+.\w+)_nsim_(\d+)'
+for filename in param_files: 
+    condition, n_hidden, n_visible, hdist, hmean, hstd, Jdist, Jmean, Jstd, nsim = re.findall(reg, filename)[0]
+    identifier = f'{condition}{n_hidden}{n_visible}{hdist}{hmean}{hstd}{Jdist}{Jmean}{Jstd}{nsim}'
+    n_nodes = int(n_hidden) + int(n_visible)
+    n_connections = int(n_nodes*(n_nodes-1)/2)
+    Jh = np.loadtxt(f'{path_mpf}{filename}')
+    J = Jh[:n_connections]
+    h = Jh[n_connections:]
+    h_dict_mpf[identifier] = h
+    J_dict_mpf[identifier] = J
 
-# why is the visible so bad?
-# too much noise?
-# some error that I made?
-# why particularly bad on the hidden nodes?
+#h_hidden_std1 = h_dict_mpf['hid24gaussian0.01.0gaussian0.01.0']
+#h_visible_std1 = h_dict_mpf['vis06gaussian0.01.0gaussian0.01.0']
+h_hidden_std05 = h_dict_mpf['hid24gaussian0.00.5gaussian0.00.5500']
+h_visible_std05 = h_dict_mpf['vis06gaussian0.00.5gaussian0.00.5500']
 
-# check the means of these columns (looks fine I think)
-A = np.loadtxt(f'{path_true}sim_true_nhid{hidden}_nvis_{visible}_th_{hdist}_tj_{Jdist}.txt')
-A.mean(axis=0) # clearly favored, disfavored 
+# load the ground truth files 
+param_files = [x for x in os.listdir(path_true) if x.startswith('format')]
+reg = r'format_Jh_nhid_(\d+)_nvis_(\d+)_th_(\w+)_(\w+.\w+)_(\w+.\w+)_tj_(\w+)_(\w+.\w+)_(\w+.\w+)_nsim_(\d+)'
+h_dict_true = {}
+J_dict_true = {}
+for filename in param_files: 
+    n_hidden, n_visible, hdist, hmean, hstd, Jdist, Jmean, Jstd, nsim = re.findall(reg, filename)[0]
+    identifier = f'{n_hidden}{n_visible}{hdist}{hmean}{hstd}{Jdist}{Jmean}{Jstd}{nsim}'
+    n_nodes = int(n_hidden) + int(n_visible)
+    n_connections = int(n_nodes*(n_nodes-1)/2)
+    Jh = np.loadtxt(f'{path_true}{filename}')
+    J = Jh[:n_connections]
+    h = Jh[n_connections:]
+    h_dict_true[identifier] = h
+    J_dict_true[identifier] = J
 
-J_true
-J_visible # generally not bad; but with some error...
-J_hidden # really far off from ground truth 
+#h_true_std1 = h_dict_true['06gaussian0.01.0gaussian0.01.0']
+h_true_std05 = h_dict_true['06gaussian0.00.5gaussian0.00.5500']
+
+## error = 0.5
+### h
+#### is this error reasonable for the visible nodes?   
+plot_params(h_true_std05, h_visible_std05, 'h_true vs. h_visible (std = 0.5)', 0.1) 
+plt.savefig(f"{figpath}h_true_vs_h_visible_std05.png")
+plt.close()
+
+#### hard to compare directly because hidden nodes could be opposite assignment 
+plot_h_hidden(h_true_std05, h_hidden_std05, 2, 'h_true vs. h_hidden (std = 0.5)', 0.1)
+plt.savefig(f"{figpath}h_true_vs_h_hidden_std05.png")
+plt.close()
+
+# J 
+J_true = J_dict_true['06gaussian0.00.5gaussian0.00.5500']
+J_vis = J_dict_mpf['vis06gaussian0.00.5gaussian0.00.5500']
+J_hid = J_dict_mpf['hid24gaussian0.00.5gaussian0.00.5500']
+
+plot_params(J_true, J_vis, 'J_true vs. J_visible (std = 0.5)', 0.1)
+plt.savefig(f"{figpath}J_true_vs_J_visible_std05.png")
+plt.close()
+
+plot_params(J_true, J_hid, 'J_true vs. J_hidden (std = 0.5)', 0.1) # hmmm 
+plt.savefig(f"{figpath}J_true_vs_J_hidden_std05.png")
+plt.close()
+
+# why is visible so bad with std = 1.0 (just too large?)
+# does not look like we can recover hidden reasonably (even with low error)

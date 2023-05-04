@@ -1,0 +1,50 @@
+P norm default; p=2.000000
+For log-sparsity=-4.000000, Log-l of held-out data is: -4.073439
+Clock time for one iteration: 7.176109000000 seconds.
+For log-sparsity=3.000000, Log-l of held-out data is: -4.157572
+Clock time for one iteration: 4.598103000000 seconds.
+For log-sparsity=1.000000, Log-l of held-out data is: -4.096685
+Clock time for one iteration: 5.070961000000 seconds.
+using brent method
+ iter [    lower,     upper]       min  err(est)
+    0 [-4.0000000, 3.0000000] 1.0000000 7.0000000
+For log-sparsity=-0.909830, Log-l of held-out data is: -4.072448
+Clock time for one iteration: 7.292226000000 seconds.
+    1 [-4.0000000, 1.0000000] -0.9098300 5.0000000
+For log-sparsity=0.043671, Log-l of held-out data is: -4.069279
+Clock time for one iteration: 5.601517000000 seconds.
+    2 [-0.9098300, 1.0000000] 0.0436713 1.9098300
+For log-sparsity=-0.333852, Log-l of held-out data is: -4.070547
+Clock time for one iteration: 6.184188000000 seconds.
+    3 [-0.3338519, 1.0000000] 0.0436713 1.3338519
+For log-sparsity=0.408956, Log-l of held-out data is: -4.071778
+Clock time for one iteration: 5.600564000000 seconds.
+    4 [-0.3338519, 0.4089564] 0.0436713 0.7428083
+For log-sparsity=-0.022796, Log-l of held-out data is: -4.069380
+Clock time for one iteration: 5.630618000000 seconds.
+    5 [-0.0227963, 0.4089564] 0.0436713 0.4317527
+For log-sparsity=0.183198, Log-l of held-out data is: -4.069477
+Clock time for one iteration: 5.619972000000 seconds.
+    6 [-0.0227963, 0.1831978] 0.0436713 0.2059942
+For log-sparsity=0.063695, Log-l of held-out data is: -4.069269
+Clock time for one iteration: 5.619315000000 seconds.
+    7 [0.0436713, 0.1831978] 0.0636953 0.1395265
+For log-sparsity=0.109341, Log-l of held-out data is: -4.069290
+Clock time for one iteration: 5.729532000000 seconds.
+    8 [0.0436713, 0.1093412] 0.0636953 0.0656698
+For log-sparsity=0.070847, Log-l of held-out data is: -4.069268
+Clock time for one iteration: 5.613706000000 seconds.
+    9 [0.0636953, 0.1093412] 0.0708468 0.0456459
+For log-sparsity=0.071829, Log-l of held-out data is: -4.069268
+Clock time for one iteration: 5.589980000000 seconds.
+   10 [0.0708468, 0.1093412] 0.0718288 0.0384944
+For log-sparsity=0.071632, Log-l of held-out data is: -4.069268
+Clock time for one iteration: 5.596955000000 seconds.
+Converged:
+   11 [0.0708468, 0.0718288] 0.0716316 0.0009820
+Best log_sparsity: 0.071632
+Now doing 500
+2899.085270
+params=[3.8793507436e-02, 1.6755339485e-01, -9.4660189027e-02, 2.5245996260e-04, 4.6282367774e-02, -3.3942639676e-02, 1.2154795994e-01, -3.0717938878e-01, 8.5506563289e-02, -2.7824332718e-02, 7.8821385521e-03, -5.6673535126e-02, 9.7767739635e-02, -8.9674172230e-02, 4.2862315455e-02, -1.3524763545e-03, -1.0030697597e-01, 5.5608153519e-02, -4.8614398827e-02, -5.0347971849e-04, 8.0326362009e-02]
+Total LogL for data, given parameters: -2017.428648
+Clock time: 81.075175000000 seconds.

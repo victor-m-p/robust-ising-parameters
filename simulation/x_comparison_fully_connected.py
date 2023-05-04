@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd 
 import re 
 import os 
-from sample_functions import read_text_file, plot_params, plot_h_hidden, ising_probs, bin_states
+from sample_functions import read_text_file, plot_params, plot_h_hidden, ising_probs, bin_states, marginalize_over_n_elements
 import matplotlib.pyplot as plt 
 
 # meta setup
@@ -59,35 +59,33 @@ vis_probs = ising_probs(h_visible[ele], J_visible[ele])
 plot_params(true_probs, vis_probs, 'x', 0.01)
 plot_params(true_probs, hid_probs, 'x', 0.01)
 
-# marginalize states 
-def marginalize_over_n_elements(configurations, probabilities, n):
-    # Remove the first n columns (elements) from configurations
-    reduced_configurations = configurations[:, n:]
-
-    # Find the unique configurations in reduced_configurations
-    unique_configurations = np.unique(reduced_configurations, axis=0)
-
-    # Initialize an empty list to store the probabilities for each unique configuration
-    marginalized_probs = []
-
-    # Loop through unique configurations and sum the probabilities corresponding to the same configuration
-    for config in unique_configurations:
-        prob = np.sum(probabilities[np.all(reduced_configurations == config, axis=1)])
-        marginalized_probs.append(prob)
-
-    # Convert lists to numpy arrays
-    marginalized_probs = np.array(marginalized_probs)
-    unique_configurations = np.array(unique_configurations)
-
-    return unique_configurations, marginalized_probs
-
 _, true_marginalized = marginalize_over_n_elements(configurations, true_probs, 2)
 _, hid_marginalized = marginalize_over_n_elements(configurations, hid_probs, 2)
 _, vis_marginalized = marginalize_over_n_elements(configurations, vis_probs, 2)
 
-# still not quite right: 
 plot_params(true_marginalized, vis_marginalized, 'x', 0.01)
 plot_params(true_marginalized, hid_marginalized, 'x', 0.01)
 
 
+
+
 # figure out the J function
+n = 2
+h = np.array([1, 2, 3, 4])
+import itertools 
+perms = list(itertools.permutations(h[:n]))
+combinations = []
+
+# Loop through the permutations and append the constant elements
+for perm in perms:
+    combination = list(perm) + list(h[n:])
+    combinations.append(combination)
+
+# Convert the combinations list to a numpy array
+combinations = np.array(combinations)
+combinations
+
+# how about the J?
+
+
+def best_hidden_fit(p_true, p_hidden): 

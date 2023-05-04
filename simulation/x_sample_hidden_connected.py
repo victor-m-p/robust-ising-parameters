@@ -5,7 +5,7 @@ over the parameters.
 '''
 
 import numpy as np 
-from sample_functions import sample_not_connected, sample_hidden_connected, sample_fully_connected, save_to_mpf
+from sample_functions import sample_not_connected, sample_hidden_connected, sample_fully_connected, save_to_mpf, construct_J
 import matplotlib.pyplot as plt 
 import seaborn as sns 
 
@@ -49,7 +49,7 @@ J_interlayer_flat = J_interlayer.flatten(order='F') # flatten column-major style
 n_nodes = n_hidden + n_visible
 J_hidden = np.zeros(int(n_hidden*(n_hidden-1)/2))
 J_visible = np.zeros(int(n_visible*(n_visible-1)/2))
-J = np.concatenate((J_hidden, J_interlayer_flat, J_visible)) 
+J = construct_J(J_hidden, J_interlayer_flat, J_visible, n_hidden, n_visible) 
 
 ## concatenate mpf style 
 Jh = np.concatenate((J, h))

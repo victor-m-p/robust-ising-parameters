@@ -66,6 +66,19 @@ def expnorm(x):
     '''
     return np.exp(x) / (np.exp(x) + np.exp(-x))
 
+def construct_J(J_hidden, J_inter, J_visible, n_hidden, n_visible):
+    idx_hidden = 0
+    idx_inter = 0
+    J_list = []
+    for i in range(n_hidden):
+        J_list += list(J_hidden[idx_hidden:idx_hidden+n_hidden-1])
+        J_list += list(J_inter[idx_inter:idx_inter+n_visible])
+        idx_hidden+=n_hidden-1
+        idx_inter+=n_visible 
+
+    J_list += list(J_visible)
+    return J_list
+
 # sample functions 
 def sample_not_connected(n_samples: int,
                          h_hidden: np.array,

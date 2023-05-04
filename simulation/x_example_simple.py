@@ -17,6 +17,37 @@ J_interlayer = np.array([[1, 0], [0, -1], [0.5, 0]])
 # corresponding data for the connected hidden layer (just adding J_hidden)
 J_hidden = np.array([0]) 
 
+nJ_hidden = int(n_hidden*(n_hidden-1)/2)
+nJ_visible = int(n_visible*(n_visible-1)/2)
+nJ_interlayer = n_hidden*n_visible
+
+J_hidden = np.zeros(nJ_hidden)
+J_visible = np.zeros(nJ_visible)
+J_inter_flat = J_interlayer.flatten(order='F') # flatten column-major style
+
+# think this works 
+# we need to validate though
+def construct_J(J_hidden, J_inter, J_visible, n_hidden, n_visible):
+    idx_hidden = 0
+    idx_inter = 0
+    J_list = []
+    for i in range(n_hidden):
+        J_list += list(J_hidden[idx_hidden:idx_hidden+n_hidden-1])
+        J_list += list(J_inter[idx_inter:idx_inter+n_visible])
+        idx_hidden+=n_hidden-1
+        idx_inter+=n_visible 
+
+    J_list += list(J_visible)
+    return J_list
+
+
+def deconstruct_J(J, n_hidden, n_visible): 
+    pass 
+
+
+# did the other thing work as well?
+
+
 # corresponding data for the fully connected model 
 h = np.array([-0.5, # first hidden node 
               0.5, # second hidden node

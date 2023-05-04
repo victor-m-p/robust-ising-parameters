@@ -14,13 +14,11 @@ d = d.replace(-1, 0)
 # consider major depression (lifetime) first
 d_life = d.drop(columns = {'AMDEYR'})
 
-# sample 30K (out of 168.016K)
-d_10k = d_life.sample(n = 10000)
-
+# predictors vs. outcome 
 d_pred = d_life.drop(columns = {'AMDELT'})
 d_out = d_life['AMDELT']
 
-# 1.21 
+# takes forever 
 model = pm.Model(coords={"predictors": d_pred.columns.values})
 with model: 
     alpha = pm.Normal("alpha", mu=0, sigma=5)
@@ -30,30 +28,5 @@ with model:
 with model: 
     idata = pm.sample(return_inferencedata=True)
 
-# sample independently for the various cases
-## ...
-
-## run just for some values of our 
-d_sub = d_life[d_life['IRSEX'] == 1]
-data_sub = d_sub[d_sub['CATAG6'] == 3]
-data_sub = data_sub[data_sub['NEWRACE2'] == 1]
-
-# now get rid of demographics & filedate
-data_sub = data_sub.drop(columns = ['IRSEX', 'CATAG6',
-                                    'NEWRACE2', 'IRMARIT'])
-
-# fit it 
-d_sub_pred = data_sub.drop(columns = {'AMDELT'})
-d_sub_out = data_sub['AMDELT']
-
-model = pm.Model(coords={"predictors": d_sub_pred.columns.values})
-with model: 
-    alpha = pm.Normal("alpha", mu=0, sigma=5)
-    beta = pm.Normal("beta", mu=0, sigma=5, dims="predictors")
-    p = pm.Deterministic("p", pm.math.invlogit(alpha + at.dot(d_sub_pred.values, beta)))
-    outcome = pm.Bernoulli("outcome", p, observed=d_sub_out.values)
-with model: 
-    idata = pm.sample(return_inferencedata=True)
-
 az.summary(idata, var_names=['alpha', 'beta'], round_to=2)
-idata.to_netcdf("../data/replication/IRSEX1.CATAG63.NEWRACE21.nc")
+idata.to_netcdf("../data/replication/full_model.nc")

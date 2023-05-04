@@ -1,5 +1,5 @@
 #!/bin/bash
-dir="../simulation/data/not_connected_mpf"
+dir="../simulation/data/fully_connected_mpf_big"
 for file in "$dir"/*
 do 
 	./mpf -c "$file"

@@ -11,6 +11,6 @@ do
     do
         random_id=$(generate_random_string)
         output_file="${file}_${random_id}_log.txt"
-        mpf -c "$file" > "$output_file"
+        ./mpf -c "$file" > "$output_file"
     done
 done

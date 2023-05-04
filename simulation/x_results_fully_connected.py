@@ -6,7 +6,7 @@ import re
 import os 
 import numpy as np 
 import matplotlib.pyplot as plt 
-from plot_functions import plot_params, plot_h_hidden
+from sample_functions import plot_params, plot_h_hidden
 
 # setup 
 figpath = 'fig/fully_connected/'

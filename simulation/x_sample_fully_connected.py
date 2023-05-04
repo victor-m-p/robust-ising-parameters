@@ -22,16 +22,16 @@ outpath_mpf = 'data/fully_connected_mpf/'
 h_type = 'gaussian'
 J_type = 'gaussian'
 h_mean = 0.0
-h_std = 0.5
+h_std = 0.1
 J_mean = 0.0
-J_std = 0.5
+J_std = 0.1
 
 # overall params (maximum 11 nodes) 
-n_nodes = 6
+n_nodes = 8
 n_hidden = 2
-list_hidden_implied = [2]
+list_hidden_implied = [n_hidden]
 n_connections = int(n_nodes*(n_nodes-1)/2)
-n_sim = 500 
+n_sim = 5000
 
 # loop over different combinations 
 

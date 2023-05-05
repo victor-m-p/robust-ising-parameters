@@ -31,19 +31,18 @@ def construct_J(J_hidden, J_inter, J_visible, n_hidden, n_visible):
     idx_hidden = 0
     idx_inter = 0
     J_list = []
+    n = 1
     for i in range(n_hidden):
-        J_list += list(J_hidden[idx_hidden:idx_hidden+n_hidden-1])
+        J_list += list(J_hidden[idx_hidden:idx_hidden+n_hidden-n])
         J_list += list(J_inter[idx_inter:idx_inter+n_visible])
-        idx_hidden+=n_hidden-1
+        idx_hidden+=n_hidden-n
         idx_inter+=n_visible 
+        n += 1
 
     J_list += list(J_visible)
     return J_list
 
-
-def deconstruct_J(J, n_hidden, n_visible): 
-    pass 
-
+j = construct_J(J_hidden, J_inter_flat, J_visible, n_hidden, n_visible)
 
 # did the other thing work as well?
 

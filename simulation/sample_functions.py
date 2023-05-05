@@ -66,18 +66,35 @@ def expnorm(x):
     '''
     return np.exp(x) / (np.exp(x) + np.exp(-x))
 
+def deconstruct_J(J, n_hidden, n_visible):
+    J_hidden = []
+    J_inter = []
+    idx = 0
+    n = 1
+    for i in range(n_hidden): 
+        J_hidden += list(J[idx:idx+n_hidden-n])
+        idx += n_hidden-n
+        J_inter += list(J[idx:idx+n_visible])
+        idx += n_visible 
+        n += 1
+    J_visible = J[idx:]
+    return np.array(J_hidden), np.array(J_inter), J_visible 
+
 def construct_J(J_hidden, J_inter, J_visible, n_hidden, n_visible):
     idx_hidden = 0
     idx_inter = 0
     J_list = []
+    n = 1
     for i in range(n_hidden):
-        J_list += list(J_hidden[idx_hidden:idx_hidden+n_hidden-1])
+        J_list += list(J_hidden[idx_hidden:idx_hidden+n_hidden-n])
         J_list += list(J_inter[idx_inter:idx_inter+n_visible])
-        idx_hidden+=n_hidden-1
+        idx_hidden+=n_hidden-n
         idx_inter+=n_visible 
+        n += 1
 
     J_list += list(J_visible)
     return J_list
+
 
 # sample functions 
 def sample_not_connected(n_samples: int,
@@ -185,7 +202,7 @@ def save_to_mpf(simulation_matrix, conversion_dict, outname, weight_list = []):
 
 # Read the text file
 def read_text_file(filename, 
-                   params_pattern = r'params=\[([\d\s.,e-]+)\]', 
+                   params_pattern = r'params=\[([\d\s.,e+-]+)\]', 
                    logl_pattern = r'Total LogL for data, given parameters: ([-\d.]+)'):
     with open(filename, 'r') as f:
         for line in f:
@@ -234,7 +251,7 @@ def plot_h_hidden(params_true,
     plt.ylabel('inferred')
     plt.suptitle(title)
 
-def marginalize_over_n_elements(configurations, probabilities, n):
+def marginalize_n(configurations, probabilities, n):
     # Remove the first n columns (elements) from configurations
     reduced_configurations = configurations[:, n:]
 
@@ -254,4 +271,3 @@ def marginalize_over_n_elements(configurations, probabilities, n):
     unique_configurations = np.array(unique_configurations)
 
     return unique_configurations, marginalized_probs
-

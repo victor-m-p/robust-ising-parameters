@@ -68,7 +68,7 @@ _, hid_marginalized = marginalize_n(configurations, hid_probs, 2)
 plot_params(true_marginalized, hid_marginalized, 'x', 0.01)
 
 # deconvert J
-J_hid, J_int, J_vis = deconstruct_J(J_hidden[3], 3, 8)
+J_hid, J_int, J_vis = deconstruct_J(J_hidden[5], 3, 8)
 J_hid
 J_int
 J_vis

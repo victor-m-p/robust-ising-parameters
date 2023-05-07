@@ -4,10 +4,13 @@ import re
 import os 
 from sample_functions import read_text_file, plot_params, plot_h_hidden, ising_probs, bin_states, marginalize_n, deconstruct_J
 import matplotlib.pyplot as plt 
+import seaborn as sns 
 
 # meta setup
 n_nodes = 11
 n_connections = int(n_nodes*(n_nodes-1)/2)
+n_hidden = 3
+n_visible = 8
 
 # match the files
 figpath = 'fig/fully_connected/'
@@ -64,6 +67,13 @@ np.max(logl_hidden_0) # -21252.27
 np.max(logl_hidden_1) # -21525.36
 np.max(logl_hidden_2) # -22048.44
 
+# variance 
+np.std(logl_hidden_neg2) # 555.13
+np.std(logl_hidden_neg1) # 181.60
+np.std(logl_hidden_0) # 114.12
+np.std(logl_hidden_1) # 4.17e-05
+np.std(logl_hidden_2) # 5.28e-06
+
 # best for each case
 best_logl_idx_neg2 = np.where(logl_hidden_neg2 == np.max(logl_hidden_neg2))[0][0]
 best_logl_idx_neg1 = np.where(logl_hidden_neg1 == np.max(logl_hidden_neg1))[0][0]
@@ -71,13 +81,21 @@ best_logl_idx_0 = np.where(logl_hidden_0 == np.max(logl_hidden_0))[0][0]
 best_logl_idx_1 = np.where(logl_hidden_1 == np.max(logl_hidden_1))[0][0]
 best_logl_idx_2 = np.where(logl_hidden_2 == np.max(logl_hidden_2))[0][0]
 
+# 556: 
+# best fit could 
+np.log(0.67)
 # read actual shit 
 param_files = [x for x in os.listdir(path_true) if x.startswith('format')]
 filename = param_files[0]
-
 params_true = np.loadtxt(f'{path_true}{filename}')
 h_true = params_true[n_connections:]
 J_true = params_true[:n_connections]
+
+np.sum(params_true**2) # 0.6715
+hbest = h_hidden_1[best_logl_idx_1]
+jbest = J_hidden_1[best_logl_idx_1]
+hJbest = np.concatenate((hbest, jbest))
+np.sum(hJbest**2) # 67.15 
 
 # compare h (hmmm)
 n_hidden = 3
@@ -97,26 +115,60 @@ plot_params(J_true, J_hidden_2[best_logl_idx_2], 'x', 0.1) # just completely fla
 # compare p states 
 configurations = bin_states(n_nodes)
 true_probs = ising_probs(h_true, J_true)
-hid_probs = ising_probs(h_hidden[best_logl_idx], J_hidden[best_logl_idx])
-#vis_probs = ising_probs(h_visible[ele], J_visible[ele])
+hid_probs_neg2 = ising_probs(h_hidden_neg2[best_logl_idx_neg2], 
+                             J_hidden_neg2[best_logl_idx_neg2])
+hid_probs_neg1 = ising_probs(h_hidden_neg1[best_logl_idx_neg1],
+                             J_hidden_neg1[best_logl_idx_neg1])
+hid_probs_0 = ising_probs(h_hidden_0[best_logl_idx_0],
+                          J_hidden_0[best_logl_idx_0])
+hid_probs_1 = ising_probs(h_hidden_1[best_logl_idx_1],
+                          J_hidden_1[best_logl_idx_1])
+hid_probs_2 = ising_probs(h_hidden_2[best_logl_idx_2],
+                          J_hidden_2[best_logl_idx_2])
 
-#plot_params(true_probs, vis_probs, 'x', 0.01)
-plot_params(true_probs, hid_probs, 'x', 0.01)
+plot_params(true_probs, hid_probs_neg2, 'x', 0.01) # crazy
+plot_params(true_probs, hid_probs_neg1, 'x', 0.01) # crazy
+plot_params(true_probs, hid_probs_0, 'x', 0.01) # crazy
+plot_params(true_probs, hid_probs_1, 'x', 0.01) # wow; big change
+plot_params(true_probs, hid_probs_2, 'x', 0.01) # crazy flat 
 
-_, true_marginalized = marginalize_n(configurations, true_probs, 2)
-_, hid_marginalized = marginalize_n(configurations, hid_probs, 2)
-#_, vis_marginalized = marginalize_over_n_elements(configurations, vis_probs, 2)
+# compare p marginalized 
+_, true_marginalized = marginalize_n(configurations, true_probs, n_hidden)
+_, hid_marginalized_neg2 = marginalize_n(configurations, hid_probs_neg2, n_hidden)
+_, hid_marginalized_neg1 = marginalize_n(configurations, hid_probs_neg1, n_hidden)
+_, hid_marginalized_0 = marginalize_n(configurations, hid_probs_0, n_hidden)
+_, hid_marginalized_1 = marginalize_n(configurations, hid_probs_1, n_hidden)
+_, hid_marginalized_2 = marginalize_n(configurations, hid_probs_2, n_hidden)
 
 #plot_params(true_marginalized, vis_marginalized, 'x', 0.01)
-plot_params(true_marginalized, hid_marginalized, 'x', 0.01)
+plot_params(true_marginalized, hid_marginalized_neg2, 'x', 0.01) # really good
+plot_params(true_marginalized, hid_marginalized_neg1, 'x', 0.01) # pretty good
+plot_params(true_marginalized, hid_marginalized_0, 'x', 0.01) # pretty good
+plot_params(true_marginalized, hid_marginalized_1, 'x', 0.01) # bad
+plot_params(true_marginalized, hid_marginalized_2, 'x', 0.01) # terrible 
 
-# deconvert J
-J_hid, J_int, J_vis = deconstruct_J(J_hidden[5], 3, 8)
-J_hid
-J_int
-J_vis
+# deconvert J & check distributions
+# we get wild values for all types;
+sns.distplot(logl_hidden_neg2)
+sns.distplot(logl_hidden_1)
 
+logl_hidden_1
 
+J_hid_neg2_list = []
+J_int_neg2_list = []
+J_vis_neg2_list = []
+for i, _ in enumerate(logl_hidden_neg2): 
+    J_hid_neg2, J_int_neg2, J_vis_neg2 = deconstruct_J(J_hidden_neg1[i], 
+                                                       n_hidden, 
+                                                       n_visible)
+    J_hid_neg2_list.append(J_hid_neg2)
+    J_int_neg2_list.append(J_int_neg2)
+    J_vis_neg2_list.append(J_vis_neg2)
+sns.distplot(np.concatenate(J_hid_neg2_list), hist=False, rug=True)
+sns.distplot(np.concatenate(J_int_neg2_list), hist=False, rug=True)
+sns.distplot(np.concatenate(J_vis_neg2_list), hist=False, rug=True)
+np.mean([0.01, 0.25, 0.64])
+np.log(0.3) 
 ###### figure out the J function ########
 n = 2
 h = np.array([1, 2, 3, 4])

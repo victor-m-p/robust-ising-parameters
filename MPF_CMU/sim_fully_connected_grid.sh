@@ -1,5 +1,5 @@
 #!/bin/bash
-dir="../simulation/data/fully_connected_grid"
+dir="../simulation/data/fully_connected_big_grid"
 generate_random_string() {
     cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1
 }

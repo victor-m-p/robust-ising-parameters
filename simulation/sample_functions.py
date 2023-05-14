@@ -67,6 +67,10 @@ def expnorm(x):
     return np.exp(x) / (np.exp(x) + np.exp(-x))
 
 def deconstruct_J(J, n_hidden, n_visible):
+    '''
+    deconstruct J into J_hidden, J_inter, J_visible.
+    needed to compare with inferred J from mpf.
+    '''
     J_hidden = []
     J_inter = []
     idx = 0
@@ -81,6 +85,10 @@ def deconstruct_J(J, n_hidden, n_visible):
     return np.array(J_hidden), np.array(J_inter), J_visible 
 
 def construct_J(J_hidden, J_inter, J_visible, n_hidden, n_visible):
+    '''
+    construct J from J_hidden, J_inter, J_visible
+    needed to compare with inferred J from mpf. 
+    '''
     idx_hidden = 0
     idx_inter = 0
     J_list = []
@@ -101,6 +109,13 @@ def sample_not_connected(n_samples: int,
                          h_hidden: np.array,
                          h_visible: np.array,
                          J_interlayer: np.array):
+    '''
+    sample Ising data from a system that is independent in both layers.
+    n_samples: number of samples desired.
+    h_hidden: local fields for hidden nodes.
+    h_visible: local fields for visible nodes.
+    J_interlayer: pairwise couplings between hidden and visible nodes.
+    '''
     
     # calculate basic stuff 
     n_visible = len(h_visible)
@@ -130,6 +145,16 @@ def sample_hidden_connected(n_samples: int,
                             J_hidden: np.array,
                             h_visible: np.array,
                             J_interlayer: np.array):
+    '''
+    sample Ising data from a system where there are connections
+    between the hidden nodes and between the hidden nodes and the visible nodes
+    but not between the visible nodes. 
+    n_samples: number of samples desired.
+    h_hidden: local fields for hidden nodes.
+    J_hidden: pairwise couplings between hidden nodes.
+    h_visible: local fields for visible nodes.
+    J_interlayer: pairwise couplings between hidden and visible nodes.
+    '''
     
     # calculate basic stuff 
     n_visible = len(h_visible)
@@ -162,6 +187,12 @@ def sample_hidden_connected(n_samples: int,
 def sample_fully_connected(n_samples: int,
                            h: np.array,
                            J: np.array):
+    '''
+    sample Ising data from a fully connected system.
+    n_samples: number of samples desired.
+    h: local fields
+    J: pairwise couplings.
+    '''
     
     # calculate basic stuff
     n_nodes = len(h)
@@ -183,8 +214,14 @@ def sample_fully_connected(n_samples: int,
     return samples.astype(int)
 
 # saving samples to mpf readable format
-def save_to_mpf(simulation_matrix, conversion_dict, outname, weight_list = []): 
-
+def save_to_mpf(simulation_matrix: np.array, 
+                conversion_dict: dict, 
+                outname: str, 
+                weight_list = []): 
+    '''
+    convert a numpy array of 1/0/-1 to mpf format (conversion dict) and save. 
+    optionally include a list of weights. 
+    '''
     # convert to bitstring in mpf format
     bitstring_list = ["".join(conversion_dict.get(str(int(x))) for x in row) for row in simulation_matrix]
 
@@ -201,9 +238,13 @@ def save_to_mpf(simulation_matrix, conversion_dict, outname, weight_list = []):
             f.write(f'{bit} {weight}\n')
 
 # Read the text file
-def read_text_file(filename, 
+def read_text_file(filename: str, 
                    params_pattern = r'params=\[([\d\s.,e+-]+)\]', 
                    logl_pattern = r'Total LogL for data, given parameters: ([-\d.]+)'):
+    '''
+    read a text file output from the 'mpf -l' option.
+    get the parameters and logl and return. 
+    '''
     with open(filename, 'r') as f:
         for line in f:
             # Check for params line
@@ -221,10 +262,14 @@ def read_text_file(filename,
 
 
 # plotting function
-def plot_params(params_true,
-                params_inf,
-                title,
-                constant):
+def plot_params(params_true: np.array,
+                params_inf: np.array,
+                title: str,
+                constant = 0.1):
+    '''
+    plot the true parameters against the inferred parameters.
+    give the plot a title & constant for the axis limits.
+    '''
     min_lim = np.min(np.concatenate((params_true, params_inf))) - constant
     max_lim = np.max(np.concatenate((params_true, params_inf))) + constant
     plt.scatter(params_true, params_inf)
@@ -233,11 +278,15 @@ def plot_params(params_true,
     plt.ylabel('inferred')
     plt.suptitle(title)
 
-def plot_h_hidden(params_true,
-                  params_inf,
-                  n_hidden,
-                  title,
-                  constant):
+def plot_h_hidden(params_true: np.array,
+                  params_inf: np.array,
+                  n_hidden: int,
+                  title: str,
+                  constant = 0.1):
+    '''
+    plot the true (h) parameters against the inferred parameters (with hidden states).
+    give the plot a title & constant for the axis limits.
+    '''
     min_lim = np.min(np.concatenate((params_true, params_inf))) - constant
     max_lim = np.max(np.concatenate((params_true, params_inf))) + constant
     params_true_hidden = params_true[:n_hidden]
@@ -251,9 +300,16 @@ def plot_h_hidden(params_true,
     plt.ylabel('inferred')
     plt.suptitle(title)
 
-def marginalize_n(configurations, probabilities, n):
+def marginalize_n(configurations: np.array, 
+                  probabilities: np.array, 
+                  n_hidden: int):
+    '''
+    marginalize the hidden states and return the marginalized 
+    unique configurations and probabilities.
+    it is assumed that the hidden nodes are the first n columns.
+    '''
     # Remove the first n columns (elements) from configurations
-    reduced_configurations = configurations[:, n:]
+    reduced_configurations = configurations[:, n_hidden:]
 
     # Find the unique configurations in reduced_configurations
     unique_configurations = np.unique(reduced_configurations, axis=0)
@@ -271,3 +327,130 @@ def marginalize_n(configurations, probabilities, n):
     unique_configurations = np.array(unique_configurations)
 
     return unique_configurations, marginalized_probs
+
+def find_indices(A: np.array, 
+                 B: np.array): 
+    '''
+    A: all configurations
+    B: observed configurations
+    '''
+    # Find the indices of the first matches in A for each row in B
+    matches = np.all(A[:, None] == B, axis=-1)
+    indices = np.argmax(matches, axis=0)
+    return indices
+
+def match_idx_to_prob(question_idx: int,
+                      states: np.array,
+                      p: np.array):
+    '''
+    question_idx: column index of the question 
+    states: all possible states
+    p: probabilities for all possible states
+    Returns the probability of the question being 0 or 1 for each state.
+    '''
+
+    n_states = states.shape[0]
+    n_splits = 2**(question_idx+1)
+    n_states_split = int(n_states/n_splits)
+
+    p_neg = []
+    p_pos = []
+    n_states_running = 0
+    while n_states_running < n_states: 
+
+        idx_neg = np.array(range(n_states_running, 
+                                n_states_split+n_states_running))
+
+        idx_pos = np.array(range(n_states_running+n_states_split, 
+                                n_states_running+n_states_split*2))
+
+        p_neg += list(p[idx_neg])
+        p_pos += list(p[idx_pos])
+
+        n_states_running += n_states_split*2
+
+    matched_p = np.column_stack((p_neg, p_pos))
+    return matched_p 
+
+
+def regularization_penalty(params: np.ndarray, 
+                           sparsity: float, 
+                           norm: float): 
+    '''
+    params: parameters inferred or true. 
+    sparsity: lambda. 
+    norm: 1 (L1) or 2 (L2) norm (or any other q-norm). 
+    returns the additional penalty by the regularization. 
+    '''
+    return (83)*(10**sparsity)*np.sum(np.abs(params**norm))
+
+def logl(params: np.ndarray, 
+         data: np.ndarray, 
+         n_nodes: int, 
+         n_hidden = 0):
+    
+    '''
+    calculates the log likelihood of data given parameters.
+    can marginalize in the case of hidden nodes. 
+    '''
+
+    # take out params 
+    nj = int(n_nodes*(n_nodes-1)/2)
+    h = params[nj:]
+    J = params[:nj]
+
+    # all configurations
+    configs = bin_states(n_nodes) 
+
+    # calculate probabilities
+    true_probs = ising_probs(h, J)
+
+    # calculate marginalized probabilities
+    configs_marginal, probs_marginal = marginalize_n(configs, true_probs, n_hidden)
+
+    # take out first n rows of data 
+    data_marginal = data[:, n_hidden:]
+
+    # calculate log likelihood
+    indices = find_indices(configs_marginal, data_marginal)
+    probabilities = probs_marginal[indices]
+    logprobs = np.log(probabilities)
+    sumlogprobs = np.sum(logprobs)
+    
+    return sumlogprobs
+
+def DKL(params_true: np.ndarray, 
+       params_model: np.ndarray, 
+       n_nodes: int,
+       n_hidden = 0): 
+    '''
+    params_true: true parameters (when known)
+    params_model: inferred parameters
+    n_nodes: number of nodes in the system
+    n_hidden: number of hidden nodes (assumes they are the first columns).
+    returns: D_KL(P_true||P_model) which can be thought of as the excess surprise
+    from using P_model when the actual distribution is P_true.  
+    '''
+
+    # take out params 
+    nj = int(n_nodes*(n_nodes-1)/2)
+    h_true = params_true[nj:]
+    J_true = params_true[:nj]
+    h_model = params_model[nj:]
+    J_model = params_model[:nj]
+
+    # all configurations
+    configs = bin_states(n_nodes)
+
+    # calculate probabilities
+    true_probs = ising_probs(h_true, J_true)
+    model_probs = ising_probs(h_model, J_model)
+
+    # marginalize 
+    _, true_probs_marginal = marginalize_n(configs, true_probs, n_hidden)
+    _, model_probs_marginal = marginalize_n(configs, model_probs, n_hidden)
+
+    # calculate KL divergence
+    kl = np.sum(true_probs_marginal*np.log(true_probs_marginal/model_probs_marginal))
+    return kl 
+

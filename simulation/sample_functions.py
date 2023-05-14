@@ -372,6 +372,13 @@ def match_idx_to_prob(question_idx: int,
     matched_p = np.column_stack((p_neg, p_pos))
     return matched_p 
 
+def param_magnitude(params: np.ndarray,
+                    norm: float = 1.0):
+    '''
+    params: inferred or true parameters. 
+    returns the magnitude of the parameters. 
+    '''
+    return np.sum(np.abs(params)**norm)
 
 def regularization_penalty(params: np.ndarray, 
                            sparsity: float, 
@@ -420,9 +427,9 @@ def logl(params: np.ndarray,
     return sumlogprobs
 
 def DKL(params_true: np.ndarray, 
-       params_model: np.ndarray, 
-       n_nodes: int,
-       n_hidden = 0): 
+        params_model: np.ndarray, 
+        n_nodes: int,
+        n_hidden = 0): 
     '''
     params_true: true parameters (when known)
     params_model: inferred parameters

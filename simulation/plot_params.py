@@ -8,15 +8,16 @@ import seaborn as sns
 import arviz as az
 
 # meta setup
-n_nodes = 11
+n_nodes = 13
 n_connections = int(n_nodes*(n_nodes-1)/2)
 n_hidden = 3
-n_visible = 8
+n_visible = 10
+n_obs = 500
 
 # match the files
 figpath = 'fig/fully_connected/'
-path_mpf = 'data/fully_connected_big_grid/'
-path_true = 'data/fully_connected_true_big/'
+path_mpf = f'data/fully_connected_nn{n_nodes}_nsim{n_obs}_mpf/'
+path_true = f'data/fully_connected_nn{n_nodes}_nsim{n_obs}_true/'
 
 # load files helper  
 def load_txt_dir(path, files):
@@ -68,30 +69,30 @@ df_magnitude_squared = pd.merge(df_mean, df_HDI, on='sparsity')
 df_magnitude_squared = pd.merge(df_magnitude_squared, df_min, on='sparsity')
 df_magnitude_squared['sparsity'] = df_magnitude_squared['sparsity'].astype(float)
 
-# plot mean(HDI) and min(HDI)
+# main plot 
 fig, ax = plt.subplots(figsize=(10, 6))
 
-# Vertical line for each X from Y_lower to Y_upper
+## Vertical line for each X from Y_lower to Y_upper
 for _, row in df_magnitude_squared.iterrows():
     plt.plot([row['sparsity'], row['sparsity']], 
              [row['HDI_lower'], row['HDI_upper']], 
              color='tab:grey')
 
-# Scatter plot for mean_Y
+## Scatter plot for mean_Y
 plt.scatter(df_magnitude_squared['sparsity'], 
             df_magnitude_squared['mean_param_magnitude'], 
             color='tab:blue', 
             label='mean(params**2)',
             zorder=2)
 
-# Scatter plot for max_Y
+## Scatter plot for max_Y
 plt.scatter(df_magnitude_squared['sparsity'], 
             df_magnitude_squared['min_param_magnitude'], 
             color='tab:orange', 
             label='min(params**2)',
             zorder=2)
 
-# horizontal line for true 
+## horizontal line for true 
 plt.plot([-1, 1], [true_magnitude_squared, true_magnitude_squared], 
          color='tab:red', label='true params**2')
 
@@ -103,7 +104,7 @@ plt.xlabel('Sparsity')
 plt.ylabel(r'$\sum \; \beta^2$')
 plt.grid(True)
 plt.legend()
-plt.savefig(f"{figpath}param_magnitude_squared_n5000_n100.png")
+plt.savefig(f"{figpath}param_magnitude_squared_nn{n_nodes}_nsim{n_sims}.png")
 
 # plot distributions 
 fig, ax = plt.subplots()
@@ -114,5 +115,5 @@ for i in valrange:
 plt.xlabel(r'$\sum \; \beta^2$')
 plt.title('Distribution of params**2')
 plt.legend()
-plt.savefig(f"{figpath}param_magnitude_squared_n5000_n100_distributions.png")
+plt.savefig(f"{figpath}param_magnitude_squared_nn{n_nodes}_nsim{n_sims}_distributions.png")
 plt.close()

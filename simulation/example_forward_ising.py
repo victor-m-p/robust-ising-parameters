@@ -46,7 +46,6 @@ j = construct_J(J_hidden, J_inter_flat, J_visible, n_hidden, n_visible)
 
 # did the other thing work as well?
 
-
 # corresponding data for the fully connected model 
 h = np.array([-0.5, # first hidden node 
               0.5, # second hidden node

@@ -1,5 +1,5 @@
 #!/bin/bash
-dir="../simulation/data/fully_connected_nn13_nsim500_mpf"
+dir="../simulation/data/fully_connected_nn11_nsim5000_visible_mpf"
 generate_random_string() {
     cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1
 }

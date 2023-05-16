@@ -2,22 +2,22 @@ import numpy as np
 import pandas as pd 
 import re 
 import os 
-from sample_functions import read_text_file, regularization_penalty, param_magnitude
+from sample_functions import read_text_file, param_magnitude_mean
 import matplotlib.pyplot as plt 
 import seaborn as sns 
 import arviz as az
 
 # meta setup
-n_nodes = 13
+n_nodes = 11
 n_connections = int(n_nodes*(n_nodes-1)/2)
 n_hidden = 3
-n_visible = 10
-n_obs = 500
+n_visible = n_nodes-n_hidden
+n_sim = 5000
 
 # match the files
 figpath = 'fig/fully_connected/'
-path_mpf = f'data/fully_connected_nn{n_nodes}_nsim{n_obs}_mpf/'
-path_true = f'data/fully_connected_nn{n_nodes}_nsim{n_obs}_true/'
+path_mpf = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_mpf/'
+path_true = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_true/'
 
 # load files helper  
 def load_txt_dir(path, files):
@@ -47,12 +47,12 @@ par_true = np.loadtxt(f"{path_true}{filename}")
 
 # calculate the magnitude of paramters for models 
 n_sim = 100
-dct_magnitude_squared = {key: [param_magnitude(dct_par[key][ele], 2) for ele in range(n_sim)] for key in dct_par.keys()}
-dct_magnitude_absolute = {key: [param_magnitude(dct_par[key][ele], 1) for ele in range(n_sim)] for key in dct_par.keys()}
+dct_magnitude_squared = {key: [param_magnitude_mean(dct_par[key][ele], 2) for ele in range(n_sim)] for key in dct_par.keys()}
+dct_magnitude_absolute = {key: [param_magnitude_mean(dct_par[key][ele], 1) for ele in range(n_sim)] for key in dct_par.keys()}
 
 # calculate the magnitude of parameters for true 
-true_magnitude_squared = param_magnitude(par_true, 2)
-true_magnitude_absolute = param_magnitude(par_true, 1) 
+true_magnitude_squared = param_magnitude_mean(par_true, 2)
+true_magnitude_absolute = param_magnitude_mean(par_true, 1) 
 
 ## calculate metrics for squared parameters 
 hdi_prob = .95
@@ -104,7 +104,7 @@ plt.xlabel('Sparsity')
 plt.ylabel(r'$\sum \; \beta^2$')
 plt.grid(True)
 plt.legend()
-plt.savefig(f"{figpath}param_magnitude_squared_nn{n_nodes}_nsim{n_sims}.png")
+plt.savefig(f"{figpath}param_magnitude_squared_nn{n_nodes}_nsim{n_sim}.png")
 
 # plot distributions 
 fig, ax = plt.subplots()
@@ -115,5 +115,5 @@ for i in valrange:
 plt.xlabel(r'$\sum \; \beta^2$')
 plt.title('Distribution of params**2')
 plt.legend()
-plt.savefig(f"{figpath}param_magnitude_squared_nn{n_nodes}_nsim{n_sims}_distributions.png")
+plt.savefig(f"{figpath}param_magnitude_squared_nn{n_nodes}_nsim{n_sim}_distributions.png")
 plt.close()

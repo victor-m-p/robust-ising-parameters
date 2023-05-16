@@ -300,9 +300,7 @@ def plot_h_hidden(params_true: np.array,
     plt.ylabel('inferred')
     plt.suptitle(title)
 
-def marginalize_n(configurations: np.array, 
-                  probabilities: np.array, 
-                  n_hidden: int):
+def marginalize_n(configurations: np.array, probabilities: np.array, n_hidden: int):
     '''
     marginalize the hidden states and return the marginalized 
     unique configurations and probabilities.
@@ -311,22 +309,14 @@ def marginalize_n(configurations: np.array,
     # Remove the first n columns (elements) from configurations
     reduced_configurations = configurations[:, n_hidden:]
 
-    # Find the unique configurations in reduced_configurations
-    unique_configurations = np.unique(reduced_configurations, axis=0)
+    # Find the unique configurations in reduced_configurations and their inverse
+    unique_configurations, inverse = np.unique(reduced_configurations, axis=0, return_inverse=True)
 
-    # Initialize an empty list to store the probabilities for each unique configuration
-    marginalized_probs = []
-
-    # Loop through unique configurations and sum the probabilities corresponding to the same configuration
-    for config in unique_configurations:
-        prob = np.sum(probabilities[np.all(reduced_configurations == config, axis=1)])
-        marginalized_probs.append(prob)
-
-    # Convert lists to numpy arrays
-    marginalized_probs = np.array(marginalized_probs)
-    unique_configurations = np.array(unique_configurations)
+    # Sum the probabilities corresponding to the same configuration using bincount
+    marginalized_probs = np.bincount(inverse, weights=probabilities)
 
     return unique_configurations, marginalized_probs
+
 
 def find_indices(A: np.array, 
                  B: np.array): 
@@ -372,13 +362,21 @@ def match_idx_to_prob(question_idx: int,
     matched_p = np.column_stack((p_neg, p_pos))
     return matched_p 
 
-def param_magnitude(params: np.ndarray,
-                    norm: float = 1.0):
+def param_magnitude_sum(params: np.ndarray,
+                        norm: float = 1.0):
     '''
     params: inferred or true parameters. 
     returns the magnitude of the parameters. 
     '''
     return np.sum(np.abs(params)**norm)
+
+def param_magnitude_mean(params: np.ndarray,
+                         norm: float = 1.0):
+    '''
+    params: inferred or true parameters. 
+    returns the magnitude of the parameters. 
+    '''
+    return np.mean(np.abs(params)**norm)
 
 def regularization_penalty(params: np.ndarray, 
                            sparsity: float, 

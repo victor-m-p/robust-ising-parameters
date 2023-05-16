@@ -8,15 +8,16 @@ import seaborn as sns
 import arviz as az
 
 # meta setup
-n_nodes = 11
-n_connections = int(n_nodes*(n_nodes-1)/2)
+n_nodes = 13
 n_hidden = 3
-n_visible = 8
+n_connections = int(n_nodes*(n_nodes-1)/2)
+n_visible = n_nodes-n_hidden
+n_sim = 500
 
 # match the files
 figpath = 'fig/fully_connected/'
-path_mpf = 'data/fully_connected_big_grid/'
-path_true = 'data/fully_connected_true_big/'
+path_mpf = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_mpf/'
+path_true = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_true/'
 
 # load files helper  
 def load_txt_dir(path, files):
@@ -46,16 +47,19 @@ par_true = np.loadtxt(f"{path_true}{filename}")
 
 # faster DKL where we do not recompute 
 # see DKL function in sample_functions.py  
-def DKL_precompute(configs, 
+def DKL_precompute(inverse,
                    params_model, 
                    true_probs_marginal, 
-                   n_nodes, 
-                   n_hidden):
+                   n_nodes):
+    
+    # get model probabilities
     nj = int(n_nodes*(n_nodes-1)/2)
     h_model = params_model[nj:]
     J_model = params_model[:nj]
     model_probs = ising_probs(h_model, J_model)
-    _, model_probs_marginal = marginalize_n(configs, model_probs, n_hidden)
+    
+    # quick marginalize 
+    model_probs_marginal = np.bincount(inverse, weights=model_probs)
     return np.sum(true_probs_marginal*np.log(true_probs_marginal/model_probs_marginal))
 
 # precompute to speed up 
@@ -63,9 +67,12 @@ configs = bin_states(n_nodes)
 true_probs = ising_probs(par_true[n_connections:], par_true[:n_connections])
 _, true_probs_marginal = marginalize_n(configs, true_probs, n_hidden)
 
+reduced_configurations = configs[:, n_hidden:]
+_, inverse = np.unique(reduced_configurations, axis=0, return_inverse=True)
+
 # calculate DKL 
 n_sim = 100 # already takes a little while 
-dct_DKL = {key: [DKL_precompute(configs, dct_par[key][ele], true_probs_marginal, n_nodes, n_hidden) for ele in range(n_sim)] for key in dct_par.keys()}
+dct_DKL = {key: [DKL_precompute(inverse, dct_par[key][ele], true_probs_marginal, n_nodes) for ele in range(n_sim)] for key in dct_par.keys()}
 
 ## calculate metrics 
 hdi_prob = .95
@@ -111,7 +118,7 @@ plt.xlabel('Sparsity')
 plt.ylabel(r'$D_{KL}(P_{true}||P_{model})$')
 plt.grid(True)
 plt.legend()
-plt.savefig(f"{figpath}DKL_L2_n5000_n100_overview.png")
+plt.savefig(f"{figpath}DKL_L2_nn{n_nodes}_nsim{n_sim}_overview.png")
 plt.close()
 
 # plot distributions 
@@ -123,7 +130,7 @@ for i in valrange:
 plt.xlabel(r'$D_{KL}(P_{true}||P_{model})$')
 plt.title('Distribution of DKL')
 plt.legend()
-plt.savefig(f"{figpath}DKL_L2_n5000_n100_distributions.png")
+plt.savefig(f"{figpath}DKL_L2_nn{n_nodes}_nsim{n_sim}_distributions.png")
 plt.close()
 
 ###### delete the below ########

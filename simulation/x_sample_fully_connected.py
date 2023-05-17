@@ -5,9 +5,8 @@ over the parameters.
 '''
 
 import numpy as np 
-from sample_functions import sample_not_connected, sample_hidden_connected, sample_fully_connected, save_to_mpf
-import matplotlib.pyplot as plt 
-import seaborn as sns 
+from sample_functions import sample_fully_connected, save_to_mpf
+import os 
 
 # for saving to mpf format
 conversion_dict = {
@@ -17,15 +16,17 @@ conversion_dict = {
 }
 
 # overall params (maximum 11 nodes) 
-n_nodes = 13
-n_hidden = 3
-list_hidden_implied = [n_hidden]
+n_nodes = 20
+n_hidden = 15
+list_hidden_implied = [1, 2, 3]
 n_connections = int(n_nodes*(n_nodes-1)/2)
 n_sim = 500
 
 # meta settings
 outpath_true = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_true/'
 outpath_mpf = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_mpf/'
+os.mkdir(f'{outpath_true}')
+os.mkdir(f'{outpath_mpf}')
 h_type = 'gaussian'
 J_type = 'gaussian'
 h_mean = 0.0
@@ -55,9 +56,9 @@ np.savetxt(f'{outpath_true}sim_true_nhid_0_nvis_{n_nodes}_th_{h_type}_{h_mean}_{
            sim,
            fmt='%d') 
 
-save_to_mpf(sim,
-            conversion_dict,
-            f'{outpath_mpf}sim_vis_mpf_nhid_0_nvis_{n_nodes}_th_{h_type}_{h_mean}_{h_std}_tj_{J_type}_{J_mean}_{J_std}_nsim_{n_sim}.txt')
+#save_to_mpf(sim,
+#            conversion_dict,
+#            f'{outpath_mpf}sim_hid_mpf_nhid_0_nvis_{n_nodes}_th_{h_type}_{h_mean}_{h_std}_tj_{J_type}_{J_mean}_{J_std}_nsim_{n_sim}.txt')
 
 # now for different number of implied hidden nodes 
 n_visible=n_nodes-n_hidden

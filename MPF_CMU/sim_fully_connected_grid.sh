@@ -1,5 +1,5 @@
 #!/bin/bash
-dir="../simulation/data/fully_connected_nn11_nsim5000_visible_mpf"
+dir="../simulation/data/fully_connected_nn20_nsim500_mpf"
 generate_random_string() {
     cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1
 }
@@ -14,7 +14,7 @@ for file in "$dir"/*
 do
     for grid_value in "${grid_values[@]}"
     do
-        for i in {1..320}
+        for i in {1..100}
         do
             random_id=$(generate_random_string)
             output_file="${file}_${grid_value}_${random_id}_log.txt"

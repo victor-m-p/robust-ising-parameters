@@ -6,6 +6,7 @@ from sample_functions import read_text_file, param_magnitude_mean
 import matplotlib.pyplot as plt 
 import seaborn as sns 
 import arviz as az
+import json
 
 # meta setup
 n_nodes = 13
@@ -57,9 +58,16 @@ par_true = np.loadtxt(f"{path_true}{filename}")
 ### compare magnitude of parameters ###
 
 # calculate the magnitude of paramters for models 
-n_sim = 100
-dct_magnitude_hidden = {key: [param_magnitude_mean(dct_hidden[key][ele], 2) for ele in range(n_sim)] for key in dct_hidden.keys()}
-dct_magnitude_visible = {key: [param_magnitude_mean(dct_visible[key][ele], 2) for ele in range(n_sim)] for key in dct_visible.keys()}
+dct_magnitude_hidden = {key: [param_magnitude_mean(dct_hidden[key][ele], 2) for ele in range(len(dct_hidden['-1.00']))] for key in dct_hidden.keys()}
+dct_magnitude_visible = {key: [param_magnitude_mean(dct_visible[key][ele], 2) for ele in range(len(dct_hidden['-1.00']))] for key in dct_visible.keys()}
+
+### should also be for only the visible ... ### 
+
+#with open('../data/fully_connected_nn{n_nodes}_nsim{n_sim}_params/magnitude_observed_hidden.json', 'w') as f: 
+#    json.dump(dct_magnitude_hidden, f)
+
+#with open('../data/fully_connected_nn{n_nodes}_nsim{n_sim}_params/magnitude_observed_visible.json', 'w') as f:
+#    json.dump(dct_magnitude_visible, f)
 
 # calculate the magnitude of parameters for true 
 true_magnitude = param_magnitude_mean(par_true, 2)
@@ -142,7 +150,7 @@ def observed_params(params, n_nodes, n_hidden):
     return params_observed 
 
 obspar_true = observed_params(par_true, n_nodes, n_hidden)
-dct_obspar_hidden = {key: [observed_params(dct_hidden[key][ele], n_nodes, n_hidden) for ele in range(len(dct_hidden))] for key in dct_hidden.keys()}
+dct_obspar_hidden = {key: [observed_params(dct_hidden[key][ele], n_nodes, n_hidden) for ele in range(len(dct_hidden['-1.00']))] for key in dct_hidden.keys()}
 
 ## calculate average error ## 
 def calculate_param_MSE(dct_observed, dct_true, sparsity_range):
@@ -153,6 +161,13 @@ def calculate_param_MSE(dct_observed, dct_true, sparsity_range):
 
 dct_obspar_hidden_MSE = calculate_param_MSE(dct_obspar_hidden, obspar_true, sparsity_range)
 dct_obspar_visible_MSE = calculate_param_MSE(dct_visible, obspar_true, sparsity_range)
+
+## NEW: save params without 
+with open(f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_params/MSE_observed_hidden.json', 'w') as f: 
+    json.dump(dct_obspar_hidden_MSE, f)
+
+with open(f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_params/MSE_observed_visible.json', 'w') as f:
+    json.dump(dct_obspar_visible_MSE, f)
 
 ## plot average parameter error ##
 df_error_hidden = construct_par_df(dct_obspar_hidden_MSE, sparsity_range)

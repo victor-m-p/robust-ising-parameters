@@ -1,11 +1,8 @@
 import numpy as np 
-import pandas as pd 
 import re 
 import os 
-from sample_functions import read_text_file, plot_params, plot_h_hidden, ising_probs, bin_states, marginalize_n, deconstruct_J, DKL
-import matplotlib.pyplot as plt 
-import seaborn as sns 
-import arviz as az
+from sample_functions import read_text_file, ising_probs, bin_states, marginalize_n
+import json 
 
 # meta setup
 n_nodes = 13
@@ -96,6 +93,14 @@ n = 100 # already takes a little while
 dct_hidden_DKL = {key: [DKL_precompute(inverse, dct_hidden[key][ele], true_probs_marginal, n_nodes) for ele in range(n)] for key in dct_hidden.keys()}
 dct_visible_DKL = {key: [DKL_visible(dct_visible[key][ele], true_probs_marginal, n_visible) for ele in range(n)] for key in dct_visible.keys()}
 
+## NEW: save params without 
+with open(f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_params/DKL_hidden_n{n}.json', 'w') as f: 
+    json.dump(dct_hidden_DKL, f)
+
+with open(f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_params/DKL_visible_n{n}.json', 'w') as f:
+    json.dump(dct_visible_DKL, f)
+
+'''
 def construct_DKL_df(dct_DKL, sparsity_range): 
     ## calculate metrics 
     hdi_prob = .95
@@ -120,4 +125,6 @@ os.mkdir(f"{param_dir}")
 df_DKL_visible.to_csv(f"{param_dir}DKL_visible_n100.csv")
 df_DKL_hidden.to_csv(f"{param_dir}DKL_hidden_n100.csv")
 
-### plot in other document ### 
+'''
+
+

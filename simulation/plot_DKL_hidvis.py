@@ -90,24 +90,3 @@ def plot_DKL_comparison(df_DKL_hidden, df_DKL_visible, param,
 # we have not shown this for a "wrong" number of hidden nodes. 
 plot_DKL_comparison(df_DKL_hidden, df_DKL_visible, 'mean_DKL', nn, nsim)
 plot_DKL_comparison(df_DKL_hidden, df_DKL_visible, 'min_DKL', nn, nsim)
-
-# plot distributions 
-## need to save distributions 
-def plot_DKL_distributions(dct_DKL, n_nodes, n_sim, condition): 
-
-    fig, ax = plt.subplots()
-    valrange=["-1.00", "-0.50", "00.00", "00.50"]
-    col=['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
-    for i in valrange:
-        sns.histplot(dct_DKL[i], label=i, bins=10, color=col[valrange.index(i)])
-    plt.xlabel(r'$D_{KL}(P_{true}||P_{model})$')
-    plt.title('Distribution of DKL')
-    plt.legend()
-    plt.savefig(f"{figpath}DKL_L2_nn{n_nodes}_nsim{n_sim}_{condition}_distributions.png")
-    plt.close()
-
-## basically no variation in DKL. 
-## is this just because there is a better way to fit the observed data
-## than the ACTUAL parameters?
-plot_DKL_distributions(dct_hidden_DKL)
-plot_DKL_distributions(dct_visible_DKL)

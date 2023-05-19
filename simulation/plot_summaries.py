@@ -1,3 +1,9 @@
+'''
+log likelihood has been checked against mpf 
+so we could just use this instead of calculating
+would be a lot faster 
+'''
+
 import numpy as np 
 import matplotlib.pyplot as plt 
 import pandas as pd 

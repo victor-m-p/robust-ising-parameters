@@ -392,7 +392,8 @@ def regularization_penalty(params: np.ndarray,
 def logl(params: np.ndarray, 
          data: np.ndarray, 
          n_nodes: int, 
-         n_hidden = 0):
+         n_hidden = 0,
+         configs = None):
     
     '''
     calculates the log likelihood of data given parameters.
@@ -405,22 +406,26 @@ def logl(params: np.ndarray,
     J = params[:nj]
 
     # all configurations
-    configs = bin_states(n_nodes) 
+    if configs is None:
+        configs = bin_states(n_nodes) 
 
     # calculate probabilities
     true_probs = ising_probs(h, J)
-
-    # calculate marginalized probabilities
-    configs_marginal, probs_marginal = marginalize_n(configs, true_probs, n_hidden)
-
-    # take out first n rows of data 
+    
+    # take out marginal data
     data_marginal = data[:, n_hidden:]
 
+    # calculate marginalized probabilities
+    if n_hidden > 1: 
+        configs_marginal, probs_marginal = marginalize_n(configs, true_probs, n_hidden)
+    else: 
+        configs_marginal = configs 
+        probs_marginal = true_probs
+        
     # calculate log likelihood
-    indices = find_indices(configs_marginal, data_marginal)
-    probabilities = probs_marginal[indices]
-    logprobs = np.log(probabilities)
-    sumlogprobs = np.sum(logprobs)
+    indices = find_indices(configs_marginal, data_marginal) # overlap in indices 
+    probabilities = probs_marginal[indices] # probability for these indices 
+    sumlogprobs = np.sum(np.log(probabilities))
     
     return sumlogprobs
 

@@ -55,6 +55,19 @@ for i in sparsity_range:
 filename = [x for x in os.listdir(path_true) if x.startswith('format')][0]
 par_true = np.loadtxt(f"{path_true}{filename}")
 
+### magnitude on all params ###
+dct_magnitude_hidden = {key: [param_magnitude_mean(dct_hidden[key][ele], 2) for ele in range(len(dct_hidden['-1.00']))] for key in dct_hidden.keys()}
+dct_magnitude_visible = {key: [param_magnitude_mean(dct_visible[key][ele], 2) for ele in range(len(dct_hidden['-1.00']))] for key in dct_visible.keys()}
+
+dct_magnitude_hidden
+dct_magnitude_visible
+
+import matplotlib.pyplot as plt 
+plt.plot(dct_magnitude_hidden['-0.30'])
+plt.plot(dct_magnitude_visible['-0.30'])
+
+par_hid = dct_hidden['-0.30'][0]
+
 def extract_params(params, n_nodes, n_hidden, type='visible'): 
     # extract h, J
     n_connections = int(n_nodes*(n_nodes-1)/2)
@@ -76,40 +89,11 @@ def extract_params(params, n_nodes, n_hidden, type='visible'):
     params_sub = np.concatenate((J_sub, h_sub))
     return params_sub 
 
-obspar_true = extract_params(par_true, n_nodes, n_hidden, 'visible')
-dct_obspar_hidden = {key: [extract_params(dct_hidden[key][ele], n_nodes, n_hidden, 'visible') for ele in range(len(dct_hidden['-1.00']))] for key in dct_hidden.keys()}
+# extract params
+h_vis = extract_params(par_hid, n_nodes, n_hidden, type='visible')
+t_vis = extract_params(par_true, n_nodes, n_hidden, type='visible')
+plt.scatter(h_vis, t_vis)
 
-# calculate the magnitude of paramters for models 
-dct_magnitude_hidden = {key: [param_magnitude_mean(dct_obspar_hidden[key][ele], 2) for ele in range(len(dct_hidden['-1.00']))] for key in dct_obspar_hidden.keys()}
-dct_magnitude_visible = {key: [param_magnitude_mean(dct_visible[key][ele], 2) for ele in range(len(dct_hidden['-1.00']))] for key in dct_visible.keys()}
-
-def dct_to_df(dct, val):
-    expanded = [(k, i+1, v_i) for k, v in dct.items() for i, v_i in enumerate(v)]
-    df = pd.DataFrame(expanded, columns=['idx', 'num', f'{val}'])
-    return df 
-
-df_magnitude_hidden = dct_to_df(dct_magnitude_hidden, 'squared_magnitude')
-df_magnitude_visible = dct_to_df(dct_magnitude_visible, 'squared_magnitude')
-
-df_magnitude_hidden.to_csv(f'{outpath}param_magnitude_hidden.csv', index=False)
-df_magnitude_visible.to_csv(f'{outpath}param_magnitude_visible.csv', index=False)
-
-magnitude_true = param_magnitude_mean(obspar_true, 2)
-with open(f'{outpath}param_magnitude_true.txt', 'w') as f: 
-    f.write(str(magnitude_true))
-
-## calculate average error ## 
-def calculate_param_MSE(dct_observed, dct_true, sparsity_range):
-    dct_error = {}
-    for i in sparsity_range: 
-        dct_error[i] = [np.mean((dct_observed[i][ele] - dct_true)**2) for ele in range(len(dct_observed[i]))]
-    return dct_error
-
-dct_obspar_hidden_MSE = calculate_param_MSE(dct_obspar_hidden, obspar_true, sparsity_range)
-dct_obspar_visible_MSE = calculate_param_MSE(dct_visible, obspar_true, sparsity_range)
-
-df_MSE_hidden = dct_to_df(dct_obspar_hidden_MSE, 'MSE')
-df_MSE_visible = dct_to_df(dct_obspar_visible_MSE, 'MSE')
-
-df_MSE_hidden.to_csv(f'{outpath}param_MSE_hidden.csv', index=False)
-df_MSE_visible.to_csv(f'{outpath}param_MSE_visible.csv', index=False)
+h_hid = extract_params(par_hid, n_nodes, n_hidden, type='hidden')
+t_hid = extract_params(par_true, n_nodes, n_hidden, type='hidden')
+plt.scatter(h_hid, t_hid)

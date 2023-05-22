@@ -10,10 +10,15 @@ n_hidden = 3
 n_connections = int(n_nodes*(n_nodes-1)/2)
 n_visible = n_nodes-n_hidden
 n_sim = 500
+norm = 'l1'
+
+# create directory if does not exist
+outpath = f"data/fully_connected_nn{n_nodes}_nsim{n_sim}_{norm}_params/"
+if not os.path.exists(outpath): 
+    os.makedirs(outpath)
 
 # match the files
-figpath = 'fig/fully_connected/'
-path_mpf = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_mpf/'
+path_mpf = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_l1_mpf/'
 path_true = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_true/'
 
 # load files helper  
@@ -103,5 +108,5 @@ def dct_to_df(dct, val):
 d_hidden = dct_to_df(dct_hidden_DKL, 'DKL')
 d_visible = dct_to_df(dct_visible_DKL, 'DKL')
 
-d_hidden.to_csv(f"data/fully_connected_nn{n_nodes}_nsim{n_sim}_params/DKL_hidden_n{n}.csv", index=False)
-d_visible.to_csv(f"data/fully_connected_nn{n_nodes}_nsim{n_sim}_params/DKL_visible_n{n}.csv", index=False)
+d_hidden.to_csv(f"{outpath}DKL_hidden_n{n}.csv", index=False)
+d_visible.to_csv(f"{outpath}DKL_visible_n{n}.csv", index=False)

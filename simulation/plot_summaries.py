@@ -9,19 +9,25 @@ import matplotlib.pyplot as plt
 import pandas as pd 
 import seaborn as sns 
 from functools import reduce 
+import os 
 
 # setup
 nn = 13
 nsim = 500
 n = 100
-figpath = 'fig/fully_connected/'
-parampath = f'data/fully_connected_nn{nn}_nsim{nsim}_params/'
+norm = 'l1'
+figpath = f'fig/fully_connected_{norm}/'
+parampath = f'data/fully_connected_nn{nn}_nsim{nsim}_{norm}_params/'
+
+# create directory if does not exist
+if not os.path.exists(figpath): 
+    os.makedirs(figpath)
 
 # load data
 DKL_visible = pd.read_csv(f"{parampath}DKL_visible_n{n}.csv")
 DKL_hidden = pd.read_csv(f"{parampath}DKL_hidden_n{n}.csv")
-logl_visibile = pd.read_csv(f"{parampath}logL_visible_n{n}.csv")
-logl_hidden = pd.read_csv(f"{parampath}logL_hidden_n{n}.csv")
+logl_visibile = pd.read_csv(f"{parampath}logL_visible_mpf.csv")
+logl_hidden = pd.read_csv(f"{parampath}logL_hidden_mpf.csv")
 param_magnitude_visible = pd.read_csv(f"{parampath}param_magnitude_visible.csv")
 param_magnitude_hidden = pd.read_csv(f"{parampath}param_magnitude_hidden.csv")
 param_MSE_visible = pd.read_csv(f"{parampath}param_MSE_visible.csv")
@@ -47,7 +53,8 @@ d_visible['sparsity'] = pd.cut(d_visible['idx'], bins=[-np.inf, -0.3, 0.3, np.in
 
 # plot comparisons 
 def plot_compare(d_hidden, d_visible, x_var, y_var, 
-                 hlines=False, sharex=False, sharey=False):
+                 hlines=False, sharex=False, sharey=False,
+                 figpath=False):
     
     fig, axs = plt.subplots(1, 2, figsize=(12, 6), 
                             sharex=sharex, sharey=sharey)  # Create a grid of 1x2 subplots
@@ -84,18 +91,30 @@ def plot_compare(d_hidden, d_visible, x_var, y_var,
     axs[1].set_title('without hidden nodes')
 
     plt.tight_layout()  # Adjust subplot params so subplots don't overlap
-    plt.show()
+
+    if not figpath: 
+        plt.show()
+    else: 
+        plt.savefig(f"{figpath}{x_var}_{y_var}.png")
 
 plot_compare(d_hidden, d_visible, 'DKL', 'logL', 
-             hlines=logl_true, sharex=True, sharey=True)
+             hlines=logl_true, sharex=True, sharey=True,
+             figpath=figpath)
 
-plot_compare(d_hidden, d_visible, 'MSE', 'DKL')
+plot_compare(d_hidden, d_visible, 'MSE', 'DKL',
+             figpath=figpath)
 
 plot_compare(d_hidden, d_visible, 'MSE', 'logL',
-             hlines=logl_true, sharey=True)
+             hlines=logl_true, sharey=True,
+             figpath=figpath)
 
 plot_compare(d_hidden, d_visible, 'MSE', 'squared_magnitude',
-             hlines=true_magnitude)
+             hlines=true_magnitude, figpath=figpath)
+
+# wait; are we actually matching the hidden as well?
+# I am not sure how we would evaluate this with the current setup.
+# we would have to write the crazy function ...
+# also double check that there is no bug, looks almost too similar. 
 
 ''' 
 def construct_par_df(dct_magnitude, sparsity_range): 

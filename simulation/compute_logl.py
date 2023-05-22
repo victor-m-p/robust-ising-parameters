@@ -10,10 +10,10 @@ n_hidden = 3
 n_connections = int(n_nodes*(n_nodes-1)/2)
 n_visible = n_nodes-n_hidden
 n_sim = 500
+norm = 'l1'
 
 # match the files
-figpath = 'fig/fully_connected/'
-path_mpf = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_mpf/'
+path_mpf = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_{norm}_mpf/'
 path_true = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_true/'
 
 # load files helper  
@@ -46,19 +46,30 @@ for i in sparsity_range:
     dct_logl_hidden[i] = logl_hidden
     dct_logl_visible[i] = logl_visible
 
-# load true params
-filename = [x for x in os.listdir(path_true) if x.startswith('format')][0]
-par_true = np.loadtxt(f"{path_true}{filename}")
-
 # create dataframe from this
 def dct_to_df(dct, val):
     expanded = [(k, i+1, v_i) for k, v in dct.items() for i, v_i in enumerate(v)]
     df = pd.DataFrame(expanded, columns=['idx', 'num', f'{val}'])
     return df 
 
-# save 
+# save the mpf logl  
 d_hidden = dct_to_df(dct_logl_hidden, 'logL')
 d_visible = dct_to_df(dct_logl_visible, 'logL')
 
-d_hidden.to_csv(f"data/fully_connected_nn{n_nodes}_nsim{n_sim}_params/logL_hidden_mpf.csv", index=False)
-d_visible.to_csv(f"data/fully_connected_nn{n_nodes}_nsim{n_sim}_params/logL_visible_mpf.csv", index=False)
+outpath = f"data/fully_connected_nn{n_nodes}_nsim{n_sim}_{norm}_params/"
+if not os.path.exists(outpath): 
+    os.makedirs(outpath)
+
+d_hidden.to_csv(f"{outpath}logL_hidden_mpf.csv", index=False)
+d_visible.to_csv(f"{outpath}logL_visible_mpf.csv", index=False)
+
+# load true params
+filename = [x for x in os.listdir(path_true) if x.startswith('format')][0]
+par_true = np.loadtxt(f"{path_true}{filename}")
+
+# compute true logl 
+d = np.loadtxt(f"{path_true}sim_true_nhid_0_nvis_{n_nodes}_th_gaussian_0.0_0.1_tj_gaussian_0.0_0.1_nsim_{n_sim}.txt")
+logl_true = logl(par_true, d, n_nodes, n_hidden)
+
+with open(f'{outpath}logL_true.txt', 'w') as f: 
+    f.write(str(logl_true))

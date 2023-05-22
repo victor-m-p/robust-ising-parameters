@@ -5,9 +5,8 @@ over the parameters.
 '''
 
 import numpy as np 
-from sample_functions import sample_not_connected, sample_hidden_connected, sample_fully_connected, save_to_mpf, construct_J
-import matplotlib.pyplot as plt 
-import seaborn as sns 
+from sample_functions import sample_not_connected, construct_J, save_to_mpf
+import os 
 
 # for saving to mpf format
 conversion_dict = {
@@ -16,9 +15,8 @@ conversion_dict = {
     '1': '1'
 }
 
-# meta settings
-outpath_true = 'data/not_connected_true/'
-outpath_mpf = 'data/not_connected_mpf/'
+
+# meta settings 
 h_type = 'gaussian'
 J_type = 'gaussian'
 h_mean = 0.0
@@ -27,12 +25,22 @@ J_mean = 0.0
 J_std = 0.5
 
 # overall params 
-n_visible = 4
-n_hidden = 2
-list_hidden_implied = [2]
+n_visible = 10
+n_hidden = 1
+n_nodes = n_hidden + n_visible
+list_hidden_implied = [n_hidden]
 n_sim = 500 
+norm = 'l1'
 
-# loop over different combinations 
+# create directory if does not exist
+outpath_mpf = f"data/not_connected_nn{n_nodes}_nsim{n_sim}_{norm}_mpf/"
+outpath_true = f'data/not_connected_nn{n_nodes}_nsim{n_sim}_true/'
+
+if not os.path.exists(outpath_mpf): 
+    os.makedirs(outpath_mpf)
+
+if not os.path.exists(outpath_true):
+    os.makedirs(outpath_true)
 
 # set up data for the independent model
 h_hidden = np.random.normal(h_mean, h_std, n_hidden) 

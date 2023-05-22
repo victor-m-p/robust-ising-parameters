@@ -1,12 +1,12 @@
 #!/bin/bash
-dir="../simulation/data/not_connected_nn11_nsim500_l1_mpf"
+dir="../simulation/data/not_connected_nn21_nsim500_l1_mpf"
 generate_random_string() {
     cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1
 }
 
 # Generate grid values from -1.0 to 1.0 with increments of 0.05
 grid_values=()
-for i in $(seq -w -0.5 0.05 0.5); do
+for i in $(seq -w -1.0 0.1 1.0); do
     grid_values+=($i)
 done
 

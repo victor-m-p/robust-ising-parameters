@@ -22,7 +22,7 @@ J_type = 'gaussian'
 h_mean = 0.0
 h_std = 0.0
 J_mean = 0.0
-J_std = 0.5
+J_std = 1.0
 
 # overall params 
 n_visible = 20

@@ -20,12 +20,12 @@ conversion_dict = {
 h_type = 'gaussian'
 J_type = 'gaussian'
 h_mean = 0.0
-h_std = 0.5
+h_std = 0.0
 J_mean = 0.0
 J_std = 0.5
 
 # overall params 
-n_visible = 10
+n_visible = 20
 n_hidden = 1
 n_nodes = n_hidden + n_visible
 list_hidden_implied = [n_hidden]

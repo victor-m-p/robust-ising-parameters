@@ -5,21 +5,17 @@ import os
 from sample_functions import read_text_file, param_magnitude_mean
 
 # meta setup
-n_nodes = 13
-n_hidden = 3
+n_nodes = 11
+n_hidden = 1
 n_connections = int(n_nodes*(n_nodes-1)/2)
 n_visible = n_nodes-n_hidden
 n_sim = 500
-norm = 'l1'
-
-# create directory if does not exist
-outpath = f"data/fully_connected_nn{n_nodes}_nsim{n_sim}_{norm}_params/"
-if not os.path.exists(outpath): 
-    os.makedirs(outpath)
+type = 'not_connected' # fully_connected
+norm = 'l1' # l2 
 
 # match the files
-path_mpf = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_{norm}_mpf/'
-path_true = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_true/'
+path_mpf = f'data/{type}_nn{n_nodes}_nsim{n_sim}_{norm}_mpf/'
+path_true = f'data/{type}_nn{n_nodes}_nsim{n_sim}_true/'
 
 # load files helper  
 def load_txt_dir(path, files):
@@ -30,8 +26,8 @@ def load_txt_dir(path, files):
     return par_list
 
 # load mpf data
-files_hidden = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith(f'sim_hid_mpf_nhid_{n_hidden}')]
-files_visible = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith('sim_hid_mpf_nhid_0')]
+files_hidden = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith(f'sim_mpf_nhid_{n_hidden}')]
+files_visible = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith('sim_mpf_nhid_0')]
 
 sparsity_regex = re.compile(r'(?<=txt_)(.*)(?<=_)')
 sparsity_neg = np.arange(-1, 0.0, 0.05)
@@ -51,22 +47,18 @@ for i in sparsity_range:
     dct_hidden[i] = params_hidden
     dct_visible[i] = params_visible 
 
+# delete empty elements (i.e., if run over smaller grid)
+dct_hidden = {key: value for key, value in dct_hidden.items() if value}
+dct_visible = {key: value for key, value in dct_visible.items() if value}
+
 # load true params
 filename = [x for x in os.listdir(path_true) if x.startswith('format')][0]
 par_true = np.loadtxt(f"{path_true}{filename}")
 
 ### magnitude on all params ###
-dct_magnitude_hidden = {key: [param_magnitude_mean(dct_hidden[key][ele], 2) for ele in range(len(dct_hidden['-1.00']))] for key in dct_hidden.keys()}
-dct_magnitude_visible = {key: [param_magnitude_mean(dct_visible[key][ele], 2) for ele in range(len(dct_hidden['-1.00']))] for key in dct_visible.keys()}
-
-dct_magnitude_hidden
-dct_magnitude_visible
-
-import matplotlib.pyplot as plt 
-plt.plot(dct_magnitude_hidden['-0.30'])
-plt.plot(dct_magnitude_visible['-0.30'])
-
-par_hid = dct_hidden['-0.30'][0]
+first_idx = list(dct_hidden.keys())[0]
+dct_magnitude_hidden = {key: [param_magnitude_mean(dct_hidden[key][ele], 2) for ele in range(len(dct_hidden[first_idx]))] for key in dct_hidden.keys()}
+dct_magnitude_visible = {key: [param_magnitude_mean(dct_visible[key][ele], 2) for ele in range(len(dct_hidden[first_idx]))] for key in dct_visible.keys()}
 
 def extract_params(params, n_nodes, n_hidden, type='visible'): 
     # extract h, J
@@ -90,9 +82,19 @@ def extract_params(params, n_nodes, n_hidden, type='visible'):
     return params_sub 
 
 # extract params
+import matplotlib.pyplot as plt 
+example_case = '-0.50'
+par_hid = dct_hidden[example_case][0]
+par_vis = dct_visible[example_case][0]
+
+v_vis = extract_params(par_vis, n_nodes, n_hidden, type='visible')
 h_vis = extract_params(par_hid, n_nodes, n_hidden, type='visible')
 t_vis = extract_params(par_true, n_nodes, n_hidden, type='visible')
 plt.scatter(h_vis, t_vis)
+plt.plot([-1, 1], [-1, 1], color='black', linestyle='--')
+
+plt.scatter(par_vis, t_vis)
+plt.plot([-1, 1], [-1, 1], color='black', linestyle='--')
 
 h_hid = extract_params(par_hid, n_nodes, n_hidden, type='hidden')
 t_hid = extract_params(par_true, n_nodes, n_hidden, type='hidden')

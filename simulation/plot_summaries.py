@@ -12,12 +12,13 @@ from functools import reduce
 import os 
 
 # setup
-nn = 13
+nn = 11
 nsim = 500
-n = 100
+n = 32
 norm = 'l1'
-figpath = f'fig/fully_connected_{norm}/'
-parampath = f'data/fully_connected_nn{nn}_nsim{nsim}_{norm}_params/'
+type = 'not_connected'
+figpath = f'fig/{type}_{norm}/'
+parampath = f'data/{type}_nn{nn}_nsim{nsim}_{norm}_params/'
 
 # create directory if does not exist
 if not os.path.exists(figpath): 
@@ -44,12 +45,12 @@ d_hidden = reduce(lambda left,right: pd.merge(left,right,on=['idx', 'num'], how=
 
 # add sparsity grouping 
 d_hidden['idx'] = d_hidden['idx'].astype(float)
-d_hidden['sparsity'] = pd.cut(d_hidden['idx'], bins=[-np.inf, -0.3, 0.3, np.inf],
-                              labels=["[-1;-0.3[", "[-0.3, 0.3]", "]0.3;1]"])
+d_hidden['sparsity'] = pd.cut(d_hidden['idx'], bins=[-np.inf, -0.2, 0.2, np.inf],
+                              labels=["[-0.5;-0.2[", "[-0.2, 0.2]", "]0.2;0.5]"])
 
 d_visible['idx'] = d_visible['idx'].astype(float)
-d_visible['sparsity'] = pd.cut(d_visible['idx'], bins=[-np.inf, -0.3, 0.3, np.inf],
-                               labels=["[-1;-0.3[", "[-0.3, 0.3]", "]0.3;1]"])
+d_visible['sparsity'] = pd.cut(d_visible['idx'], bins=[-np.inf, -0.2, 0.2, np.inf],
+                               labels=["[-0.5;-0.2[", "[-0.2, 0.2]", "]0.2;0.5]"])
 
 # plot comparisons 
 def plot_compare(d_hidden, d_visible, x_var, y_var, 

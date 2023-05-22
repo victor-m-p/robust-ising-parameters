@@ -29,9 +29,9 @@ def load_txt_dir(path, files):
         logl_list.append(logl)
     return logl_list 
 
-# load mpf data (NB: fucked up format to visible)
-files_hidden = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith(f'sim_hid_mpf_nhid_{n_hidden}')]
-files_visible = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith('sim_vis_mpf_nhid_0')]
+# load mpf data (NB: changed format)
+files_hidden = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith(f'sim_mpf_nhid_{n_hidden}')]
+files_visible = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith('sim_mpf_nhid_0')]
 
 sparsity_regex = re.compile(r'(?<=txt_)(.*)(?<=_)')
 sparsity_neg = np.arange(-1, 0.0, 0.05)
@@ -50,6 +50,10 @@ for i in sparsity_range:
 
     dct_logl_hidden[i] = logl_hidden
     dct_logl_visible[i] = logl_visible
+
+# delete empty elements (i.e., if run over smaller grid)
+dct_hidden = {key: value for key, value in dct_logl_hidden.items() if value}
+dct_visible = {key: value for key, value in dct_logl_visible.items() if value}
 
 # create dataframe from this
 def dct_to_df(dct, val):

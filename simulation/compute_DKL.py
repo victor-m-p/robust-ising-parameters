@@ -30,9 +30,9 @@ def load_txt_dir(path, files):
         par_list.append(params)
     return par_list
 
-# load mpf data
-files_hidden = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith(f'sim_hid_mpf_nhid_{n_hidden}')]
-files_visible = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith('sim_hid_mpf_nhid_0')]
+# changed format
+files_hidden = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith(f'sim_mpf_nhid_{n_hidden}')]
+files_visible = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith('sim_mpf_nhid_0')]
 
 sparsity_regex = re.compile(r'(?<=txt_)(.*)(?<=_)')
 sparsity_neg = np.arange(-1, 0.0, 0.05)
@@ -51,6 +51,10 @@ for i in sparsity_range:
 
     dct_hidden[i] = params_hidden
     dct_visible[i] = params_visible 
+
+# delete empty elements (i.e., if run over smaller grid)
+dct_hidden = {key: value for key, value in dct_hidden.items() if value}
+dct_visible = {key: value for key, value in dct_visible.items() if value}
 
 # load true params
 filename = [x for x in os.listdir(path_true) if x.startswith('format')][0]
@@ -95,7 +99,8 @@ reduced_configurations = configs[:, n_hidden:]
 _, inverse = np.unique(reduced_configurations, axis=0, return_inverse=True)
 
 # calculate DKL hidden
-n = 100 # already takes a little while 
+first_idx = list(dct_hidden.keys())[0]
+n = np.min([len(dct_hidden[first_idx]), 100]) # already takes a little while 
 dct_hidden_DKL = {key: [DKL_precompute(inverse, dct_hidden[key][ele], true_probs_marginal, n_nodes) for ele in range(n)] for key in dct_hidden.keys()}
 dct_visible_DKL = {key: [DKL_visible(dct_visible[key][ele], true_probs_marginal, n_visible) for ele in range(n)] for key in dct_visible.keys()}
 

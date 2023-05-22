@@ -72,18 +72,22 @@ sim = sample_not_connected(
     J_interlayer
     )
 
-# this we save both in regular and mpf compatible format  
+# this we save in regular format and mpf format 
 np.savetxt(f'{outpath_true}sim_true_nhid_0_nvis_{n_nodes}_th_{h_type}_{h_mean}_{h_std}_tj_{J_type}_{J_mean}_{J_std}_nsim_{n_sim}.txt',
            sim,
            fmt='%d') 
 
 save_to_mpf(sim,
             conversion_dict,
-            f'{outpath_mpf}sim_vis_mpf_nhid_0_nvis_{n_nodes}_th_{h_type}_{h_mean}_{h_std}_tj_{J_type}_{J_mean}_{J_std}_nsim_{n_sim}.txt')
+            f'{outpath_true}sim_mpf_nhid_0_nvis_{n_nodes}_th_{h_type}_{h_mean}_{h_std}_tj_{J_type}_{J_mean}_{J_std}_nsim_{n_sim}.txt')
 
 # now for different number of implied hidden nodes 
 n_visible=n_nodes-n_hidden
 sim_visible = sim[:, n_hidden:]
+
+save_to_mpf(sim_visible,
+            conversion_dict,
+            f'{outpath_mpf}sim_mpf_nhid_0_nvis_{n_visible}_th_{h_type}_{h_mean}_{h_std}_tj_{J_type}_{J_mean}_{J_std}_nsim_{n_sim}.txt')
 
 # loop over different "proposals" for number of hidden nodes
 for i in list_hidden_implied:
@@ -93,4 +97,4 @@ for i in list_hidden_implied:
     # reformat to mpf compatible format 
     save_to_mpf(sample_i_implied, 
                 conversion_dict, 
-                f'{outpath_mpf}sim_hid_mpf_nhid_{i}_nvis_{n_visible}_th_{h_type}_{h_mean}_{h_std}_tj_{J_type}_{J_mean}_{J_std}_nsim_{n_sim}.txt')
+                f'{outpath_mpf}sim_mpf_nhid_{i}_nvis_{n_visible}_th_{h_type}_{h_mean}_{h_std}_tj_{J_type}_{J_mean}_{J_std}_nsim_{n_sim}.txt')

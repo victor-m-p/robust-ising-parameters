@@ -5,21 +5,22 @@ from sample_functions import read_text_file, ising_probs, bin_states, marginaliz
 import pandas as pd 
 
 # meta setup
-n_nodes = 13
-n_hidden = 3
+n_nodes = 11
+n_hidden = 1
 n_connections = int(n_nodes*(n_nodes-1)/2)
 n_visible = n_nodes-n_hidden
 n_sim = 500
-norm = 'l1'
+norm = 'l1' # l2 
+condition = 'not_connected' # fullly_connected
 
 # create directory if does not exist
-outpath = f"data/fully_connected_nn{n_nodes}_nsim{n_sim}_{norm}_params/"
+outpath = f"data/{condition}_nn{n_nodes}_nsim{n_sim}_{norm}_params/"
 if not os.path.exists(outpath): 
     os.makedirs(outpath)
 
 # match the files
-path_mpf = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_l1_mpf/'
-path_true = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_true/'
+path_mpf = f'data/{condition}_nn{n_nodes}_nsim{n_sim}_l1_mpf/'
+path_true = f'data/{condition}_nn{n_nodes}_nsim{n_sim}_true/'
 
 # load files helper  
 def load_txt_dir(path, files):

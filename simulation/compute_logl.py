@@ -5,16 +5,21 @@ from sample_functions import read_text_file, ising_probs, bin_states, marginaliz
 import pandas as pd 
 
 # meta setup
-n_nodes = 13
-n_hidden = 3
+n_nodes = 11
+n_hidden = 1
 n_connections = int(n_nodes*(n_nodes-1)/2)
 n_visible = n_nodes-n_hidden
 n_sim = 500
-norm = 'l1'
+norm = 'l1' # l2 
+condition = 'not_connected' # fully_connected
+
+outpath = f"data/{condition}_nn{n_nodes}_nsim{n_sim}_{norm}_params/"
+if not os.path.exists(outpath): 
+    os.makedirs(outpath)
 
 # match the files
-path_mpf = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_{norm}_mpf/'
-path_true = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_true/'
+path_mpf = f'data/{condition}_nn{n_nodes}_nsim{n_sim}_{norm}_mpf/'
+path_true = f'data/{condition}_nn{n_nodes}_nsim{n_sim}_true/'
 
 # load files helper  
 def load_txt_dir(path, files):
@@ -24,9 +29,9 @@ def load_txt_dir(path, files):
         logl_list.append(logl)
     return logl_list 
 
-# load mpf data
+# load mpf data (NB: fucked up format to visible)
 files_hidden = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith(f'sim_hid_mpf_nhid_{n_hidden}')]
-files_visible = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith('sim_hid_mpf_nhid_0')]
+files_visible = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith('sim_vis_mpf_nhid_0')]
 
 sparsity_regex = re.compile(r'(?<=txt_)(.*)(?<=_)')
 sparsity_neg = np.arange(-1, 0.0, 0.05)
@@ -56,10 +61,6 @@ def dct_to_df(dct, val):
 d_hidden = dct_to_df(dct_logl_hidden, 'logL')
 d_visible = dct_to_df(dct_logl_visible, 'logL')
 
-outpath = f"data/fully_connected_nn{n_nodes}_nsim{n_sim}_{norm}_params/"
-if not os.path.exists(outpath): 
-    os.makedirs(outpath)
-
 d_hidden.to_csv(f"{outpath}logL_hidden_mpf.csv", index=False)
 d_visible.to_csv(f"{outpath}logL_visible_mpf.csv", index=False)
 
@@ -68,8 +69,10 @@ filename = [x for x in os.listdir(path_true) if x.startswith('format')][0]
 par_true = np.loadtxt(f"{path_true}{filename}")
 
 # compute true logl 
-d = np.loadtxt(f"{path_true}sim_true_nhid_0_nvis_{n_nodes}_th_gaussian_0.0_0.1_tj_gaussian_0.0_0.1_nsim_{n_sim}.txt")
-logl_true = logl(par_true, d, n_nodes, n_hidden)
+true_data_path = [x for x in os.listdir(path_true) if x.startswith('sim_true')][0] 
+true_data = np.loadtxt(f"{path_true}{true_data_path}")
+logl_true = logl(par_true, true_data, n_nodes, n_hidden)
 
 with open(f'{outpath}logL_true.txt', 'w') as f: 
     f.write(str(logl_true))
+    

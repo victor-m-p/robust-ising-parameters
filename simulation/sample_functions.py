@@ -416,7 +416,7 @@ def logl(params: np.ndarray,
     data_marginal = data[:, n_hidden:]
 
     # calculate marginalized probabilities
-    if n_hidden > 1: 
+    if n_hidden >= 1: 
         configs_marginal, probs_marginal = marginalize_n(configs, true_probs, n_hidden)
     else: 
         configs_marginal = configs 

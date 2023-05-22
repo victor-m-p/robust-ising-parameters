@@ -5,21 +5,22 @@ import os
 from sample_functions import read_text_file, param_magnitude_mean
 
 # meta setup
-n_nodes = 13
-n_hidden = 3
+n_nodes = 11
+n_hidden = 1
 n_connections = int(n_nodes*(n_nodes-1)/2)
 n_visible = n_nodes-n_hidden
 n_sim = 500
-norm = 'l1'
+norm = 'l1' # l2
+condition = 'not_connected' # fully_connected
 
 # create directory if does not exist
-outpath = f"data/fully_connected_nn{n_nodes}_nsim{n_sim}_{norm}_params/"
+outpath = f"data/{condition}_nn{n_nodes}_nsim{n_sim}_{norm}_params/"
 if not os.path.exists(outpath): 
     os.makedirs(outpath)
 
 # match the files
-path_mpf = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_{norm}_mpf/'
-path_true = f'data/fully_connected_nn{n_nodes}_nsim{n_sim}_true/'
+path_mpf = f'data/{condition}_nn{n_nodes}_nsim{n_sim}_{norm}_mpf/'
+path_true = f'data/{condition}_nn{n_nodes}_nsim{n_sim}_true/'
 
 # load files helper  
 def load_txt_dir(path, files):
@@ -31,7 +32,7 @@ def load_txt_dir(path, files):
 
 # load mpf data
 files_hidden = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith(f'sim_hid_mpf_nhid_{n_hidden}')]
-files_visible = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith('sim_hid_mpf_nhid_0')]
+files_visible = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith('sim_vis_mpf_nhid_0')]
 
 sparsity_regex = re.compile(r'(?<=txt_)(.*)(?<=_)')
 sparsity_neg = np.arange(-1, 0.0, 0.05)
@@ -50,6 +51,10 @@ for i in sparsity_range:
 
     dct_hidden[i] = params_hidden
     dct_visible[i] = params_visible 
+
+dct_visible['-0.50'][1].shape
+dct_hidden['-0.50'][1].shape
+
 
 # load true params
 filename = [x for x in os.listdir(path_true) if x.startswith('format')][0]

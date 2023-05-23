@@ -1,11 +1,15 @@
+'''
+Last step takes a long time for large n (e.g. n > 15). 
+'''
+
 import numpy as np 
 import re 
 import os 
-from sample_functions import read_text_file, ising_probs, bin_states, marginalize_n, logl
+from sample_functions import read_text_file, logl, check_valid
 import pandas as pd 
 
 # meta setup
-n_nodes = 11
+n_nodes = 21
 n_hidden = 1
 n_connections = int(n_nodes*(n_nodes-1)/2)
 n_visible = n_nodes-n_hidden
@@ -29,18 +33,17 @@ def load_txt_dir(path, files):
         logl_list.append(logl)
     return logl_list 
 
-# load mpf data (NB: changed format)
+# changed format 
 files_hidden = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith(f'sim_mpf_nhid_{n_hidden}')]
 files_visible = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith('sim_mpf_nhid_0')]
-
 sparsity_regex = re.compile(r'(?<=txt_)(.*)(?<=_)')
-sparsity_neg = np.arange(-1, 0.0, 0.05)
-sparsity_neg = ["{:.2f}".format(num) for num in sparsity_neg]
-sparsity_pos = ["{:05.2f}".format(i/100) for i in range(0, 105, 5)] # terrible formatting
+sparsity_neg = np.arange(-1, 0.0, 0.1)
+sparsity_neg = ["{:.1f}".format(num) for num in sparsity_neg] # ["{:.2f}".format(num) for num in sparsity_neg]
+sparsity_pos = ["{:04.1f}".format(i/100) for i in range(0, 105, 10)] # ["{:05.2f}".format(i/100) for i in range(0, 105, 5)]
 sparsity_range = sparsity_neg + sparsity_pos
 
-dct_logl_hidden = {}
-dct_logl_visible = {}
+dct_hidden = {}
+dct_visible = {}
 for i in sparsity_range:
     files_hidden_i = [x for x in files_hidden if sparsity_regex.search(x).group(0).startswith(i)]
     files_visible_i = [x for x in files_visible if sparsity_regex.search(x).group(0).startswith(i)]
@@ -48,12 +51,12 @@ for i in sparsity_range:
     logl_hidden = load_txt_dir(path_mpf, files_hidden_i)
     logl_visible = load_txt_dir(path_mpf, files_visible_i)
 
-    dct_logl_hidden[i] = logl_hidden
-    dct_logl_visible[i] = logl_visible
+    dct_hidden[i] = logl_hidden
+    dct_visible[i] = logl_visible
 
 # delete empty elements (i.e., if run over smaller grid)
-dct_hidden = {key: value for key, value in dct_logl_hidden.items() if value}
-dct_visible = {key: value for key, value in dct_logl_visible.items() if value}
+dct_hidden = {k: v for k, v in dct_hidden.items() if check_valid(v)}
+dct_visible = {k: v for k, v in dct_visible.items() if check_valid(v)}
 
 # create dataframe from this
 def dct_to_df(dct, val):
@@ -62,8 +65,8 @@ def dct_to_df(dct, val):
     return df 
 
 # save the mpf logl  
-d_hidden = dct_to_df(dct_logl_hidden, 'logL')
-d_visible = dct_to_df(dct_logl_visible, 'logL')
+d_hidden = dct_to_df(dct_hidden, 'logL')
+d_visible = dct_to_df(dct_visible, 'logL')
 
 d_hidden.to_csv(f"{outpath}logL_hidden_mpf.csv", index=False)
 d_visible.to_csv(f"{outpath}logL_visible_mpf.csv", index=False)

@@ -12,12 +12,12 @@ from functools import reduce
 import os 
 
 # setup
-nn = 11
+nn = 21
 nsim = 500
 n = 32
 norm = 'l1'
 type = 'not_connected'
-figpath = f'fig/{type}_{norm}/'
+figpath = f'fig/{type}_{norm}_{nn}/'
 parampath = f'data/{type}_nn{nn}_nsim{nsim}_{norm}_params/'
 
 # create directory if does not exist
@@ -25,20 +25,20 @@ if not os.path.exists(figpath):
     os.makedirs(figpath)
 
 # load data
-DKL_visible = pd.read_csv(f"{parampath}DKL_visible_n{n}.csv")
-DKL_hidden = pd.read_csv(f"{parampath}DKL_hidden_n{n}.csv")
+#DKL_visible = pd.read_csv(f"{parampath}DKL_visible_n{n}.csv")
+#DKL_hidden = pd.read_csv(f"{parampath}DKL_hidden_n{n}.csv")
 logl_visibile = pd.read_csv(f"{parampath}logL_visible_mpf.csv")
 logl_hidden = pd.read_csv(f"{parampath}logL_hidden_mpf.csv")
 param_magnitude_visible = pd.read_csv(f"{parampath}param_magnitude_visible.csv")
 param_magnitude_hidden = pd.read_csv(f"{parampath}param_magnitude_hidden.csv")
 param_MSE_visible = pd.read_csv(f"{parampath}param_MSE_visible.csv")
 param_MSE_hidden = pd.read_csv(f"{parampath}param_MSE_hidden.csv")
-logl_true = np.loadtxt(f"{parampath}logL_true.txt").reshape(1)[0]
+#logl_true = np.loadtxt(f"{parampath}logL_true.txt").reshape(1)[0]
 true_magnitude = np.loadtxt(f"{parampath}param_magnitude_true.txt").reshape(1)[0]
 
 # create super dataframes 
-visible_dfs = [DKL_visible, logl_visibile, param_magnitude_visible, param_MSE_visible]
-hidden_dfs = [DKL_hidden, logl_hidden, param_magnitude_hidden, param_MSE_hidden]
+visible_dfs = [logl_visibile, param_magnitude_visible, param_MSE_visible] #[DKL_visible, logl_visibile, param_magnitude_visible, param_MSE_visible]
+hidden_dfs = [logl_hidden, param_magnitude_hidden, param_MSE_hidden] #[DKL_hidden, logl_hidden, param_magnitude_hidden, param_MSE_hidden]
 
 d_visible = reduce(lambda left,right: pd.merge(left,right,on=['idx', 'num'], how='inner'), visible_dfs)
 d_hidden = reduce(lambda left,right: pd.merge(left,right,on=['idx', 'num'], how='inner'), hidden_dfs)
@@ -99,14 +99,16 @@ def plot_compare(d_hidden, d_visible, x_var, y_var,
         plt.savefig(f"{figpath}{x_var}_{y_var}.png")
 
 plot_compare(d_hidden, d_visible, 'DKL', 'logL', 
-             hlines=logl_true, sharex=True, sharey=True,
+             #hlines=logl_true, 
+             sharex=True, sharey=True,
              figpath=figpath)
 
 plot_compare(d_hidden, d_visible, 'MSE', 'DKL',
              figpath=figpath)
 
 plot_compare(d_hidden, d_visible, 'MSE', 'logL',
-             hlines=logl_true, sharey=True,
+             #hlines=logl_true, 
+             sharey=True,
              figpath=figpath)
 
 plot_compare(d_hidden, d_visible, 'MSE', 'squared_magnitude',

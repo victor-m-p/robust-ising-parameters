@@ -237,6 +237,21 @@ def save_to_mpf(simulation_matrix: np.array,
         for bit, weight in zip(bitstring_list, weight_list): 
             f.write(f'{bit} {weight}\n')
 
+# filter incomplete dictionaries 
+# with values that are lists of numpy arrays 
+# and empty elements 
+# if any empty elements exist, remove key. 
+def check_valid(val):
+    if val is None:
+        return False
+    if isinstance(val, list) and len(val) == 0:
+        return False
+    if isinstance(val, np.ndarray) and len(val) == 0:
+        return False
+    if isinstance(val, list) or isinstance(val, np.ndarray):
+        return all(check_valid(x) for x in val)
+    return True
+
 # Read the text file
 def read_text_file(filename: str, 
                    params_pattern = r'params=\[([\d\s.,e+-]+)\]', 
@@ -245,7 +260,11 @@ def read_text_file(filename: str,
     read a text file output from the 'mpf -l' option.
     get the parameters and logl and return. 
     '''
+    
+    params = None
+    logl = None 
     with open(filename, 'r') as f:
+
         for line in f:
             # Check for params line
             params_match = re.match(params_pattern, line.strip())
@@ -259,7 +278,6 @@ def read_text_file(filename: str,
                 logl = float(logl_match.group(1))
             
         return params, logl
-
 
 # plotting function
 def plot_params(params_true: np.array,

@@ -2,10 +2,10 @@ import numpy as np
 import pandas as pd 
 import re 
 import os 
-from sample_functions import read_text_file, param_magnitude_mean
+from sample_functions import read_text_file, param_magnitude_mean, check_valid
 
 # meta setup
-n_nodes = 11
+n_nodes = 21
 n_hidden = 1
 n_connections = int(n_nodes*(n_nodes-1)/2)
 n_visible = n_nodes-n_hidden
@@ -33,11 +33,10 @@ def load_txt_dir(path, files):
 # changed format 
 files_hidden = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith(f'sim_mpf_nhid_{n_hidden}')]
 files_visible = [x for x in os.listdir(path_mpf) if x.endswith('_log.txt') and x.startswith('sim_mpf_nhid_0')]
-
 sparsity_regex = re.compile(r'(?<=txt_)(.*)(?<=_)')
-sparsity_neg = np.arange(-1, 0.0, 0.05)
-sparsity_neg = ["{:.2f}".format(num) for num in sparsity_neg]
-sparsity_pos = ["{:05.2f}".format(i/100) for i in range(0, 105, 5)] # terrible formatting
+sparsity_neg = np.arange(-1, 0.0, 0.1)
+sparsity_neg = ["{:.1f}".format(num) for num in sparsity_neg] # ["{:.2f}".format(num) for num in sparsity_neg]
+sparsity_pos = ["{:04.1f}".format(i/100) for i in range(0, 105, 10)] # ["{:05.2f}".format(i/100) for i in range(0, 105, 5)]
 sparsity_range = sparsity_neg + sparsity_pos
 
 dct_hidden = {}
@@ -53,8 +52,8 @@ for i in sparsity_range:
     dct_visible[i] = params_visible 
 
 # delete empty elements (i.e., if run over smaller grid)
-dct_hidden = {key: value for key, value in dct_hidden.items() if value}
-dct_visible = {key: value for key, value in dct_visible.items() if value}
+dct_hidden = {k: v for k, v in dct_hidden.items() if check_valid(v)}
+dct_visible = {k: v for k, v in dct_visible.items() if check_valid(v)}
 
 # load true params
 filename = [x for x in os.listdir(path_true) if x.startswith('format')][0]
@@ -82,7 +81,6 @@ def extract_params(params, n_nodes, n_hidden, type='visible'):
     return params_sub 
 
 # extract parameters for models
-first_idx = list(dct_hidden.keys())[0]
 obspar_true = extract_params(par_true, n_nodes, n_hidden, 'visible')
 dct_obspar_hidden = {key: [extract_params(dct_hidden[key][ele], n_nodes, n_hidden, 'visible') for ele in range(len(dct_hidden[first_idx]))] for key in dct_hidden.keys()}
 

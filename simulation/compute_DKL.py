@@ -5,7 +5,7 @@ from sample_functions import read_text_file, ising_probs, bin_states, marginaliz
 import pandas as pd 
 
 # meta setup
-n_nodes = 11
+n_nodes = 21
 n_hidden = 1
 n_connections = int(n_nodes*(n_nodes-1)/2)
 n_visible = n_nodes-n_hidden
@@ -100,7 +100,7 @@ _, inverse = np.unique(reduced_configurations, axis=0, return_inverse=True)
 
 # calculate DKL hidden
 first_idx = list(dct_hidden.keys())[0]
-n = np.min([len(dct_hidden[first_idx]), 100]) # already takes a little while 
+n = np.min([len(dct_hidden[first_idx]), 10]) # already takes a little while 
 dct_hidden_DKL = {key: [DKL_precompute(inverse, dct_hidden[key][ele], true_probs_marginal, n_nodes) for ele in range(n)] for key in dct_hidden.keys()}
 dct_visible_DKL = {key: [DKL_visible(dct_visible[key][ele], true_probs_marginal, n_visible) for ele in range(n)] for key in dct_visible.keys()}
 

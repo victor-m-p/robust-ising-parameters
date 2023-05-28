@@ -94,7 +94,7 @@ plt.plot([-1, 1], [-1, 1], color='black', linestyle='--')
 
 par_vis.shape
 h_vis.shape
-
+(21*20)/2 
 
 plt.scatter(par_vis, t_vis)
 plt.plot([-1, 1], [-1, 1], color='black', linestyle='--')
